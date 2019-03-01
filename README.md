@@ -11,3 +11,11 @@
 + 中间件
 + 几大逻辑模块，文章、评论、留言、标签、搜索
 + 日志管理
+
+## 调试（XDebug）
+
+[文档](https://xdebug.org/)，在 VS Code 中调试
+
+1. 安装插件：PHP Debug
+2. 机器上安装 XDebug
+3. 配置`php.ini`
