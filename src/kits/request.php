@@ -16,9 +16,9 @@
     public static function getData() {
       $method = $_SERVER['REQUEST_METHOD'];
 
-      // 这三个请求置于 url 之后
+      // 这三个请求数据置于 url 之后
       if ($method === 'OPTIONS' || $method === 'HEAD' || $method === 'GET') {
-        return $_REQUEST;
+        return $_GET;
       }
 
       $raw = file_get_contents('php://input');
@@ -27,13 +27,13 @@
       if ($method === 'POST') {
         $data = $_POST;
 
-        // 如果为 multipart/form-data，得要从 php://input 中拿
-        if (!$data) $data = json_decode($raw);
+        // 如果 $_POST 拿不到，得要从 php://input 中拿
+        if (!$data) $data = json_decode($raw, true);
 
         return $data;
       }
 
       // 其它请求 PUT、DELETE 从 php://input 中获取，必须保证不是 multipart/form-data 形式
-      return json_decode($raw);
+      return json_decode($raw, true);
     }
   }

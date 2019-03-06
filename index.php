@@ -2,7 +2,7 @@
   error_reporting(E_ALL | E_STRICT);
 
   require_once('./vendor/autoload.php');
-  require_once('./src/request.php');
+  require_once('./src/kits/request.php');
 
   header('Content-Type: application/json');
   header('Access-Control-Allow-Origin: *');
@@ -15,7 +15,9 @@
     }
 
     static function start() {
-      echo json_encode(new Request());
+      $req = (array)new Request();
+
+      echo json_encode($req);
     }
   }
 
