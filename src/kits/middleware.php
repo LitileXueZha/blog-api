@@ -1,4 +1,6 @@
 <?php
-  interface Middleware {
 
-  }
+interface Middleware
+{
+
+}

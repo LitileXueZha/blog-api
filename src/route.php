@@ -1,6 +1,7 @@
 <?php
-  class Route {
+
+class Route {
     function __construct($url) {
-      $this->url = $url;
+        $this->url = $url;
     }
-  }
+}

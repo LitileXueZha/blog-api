@@ -1,13 +1,35 @@
 <?php
-  class Response {
-    /**
-     * 返回给前端的 code 标识
-     * 
-     * @var Number
-     */
-    public static $codeSuccess = 1; // 响应成功
-    public static $codeFail = 0; // 响应失败，一般是客户端错误
-    public static $codeError = -1; // 响应失败，服务端错误
+
+/**
+ * 返回数据格式
+ *
+ * @example { "code": 1, "data": [1, 2] }
+ * @example { "code": -1, "error": "请求失败" }
+ */
+
+class Response
+{
+    // 返回给前端的 code 标识
+    const CODE_SUCCESS = 1; // 响应成功
+    const CODE_FAIL = 0; // 响应失败，一般是客户端错误
+    const CODE_ERROR = -1; // 响应失败，服务端错误
+
+    // HTTP 状态码
+    private $httpCode;
+    // HTTP 头部。默认选项
+    private $headers = [
+        'Content-Type: application/json',
+        // 跨域
+        'Access-Control-Allow-Origin: *',
+        'Access-Control-Allow-Methods: OPTIONS,HEAD,GET,POST,PUT,DELETE',
+        'Access-Control-Allow-Headers: *',
+    ];
+
+    // 返回 body 数据
+    private $code;
+    private $error = '请求失败';
+    private $data = [];
+
 
     /**
      * 初始化
@@ -15,16 +37,16 @@
      * @param Number $code HTTP 状态码
      * @param Array|Object $data 请求成功的数据（简写方式，也可通过 addData 添加）
      */
-    function __construct($code, $data = []) {
-      // 定义返回 code
-      if ($code >= 500) $this->code = self::$codeError;
-      else if ($code >= 400) $this->code = self::$codeFail;
-      else $this->code = self::$codeSuccess;
+    function __construct($code, $data) {
+        $this->httpCode = $code;
 
-      $this->httpCode = $code;
-      // 默认返回 json 格式
-      $this->headers = ['Content-Type: application/json'];
-      $this->data = (array) $data;
+        // 定义返回 code
+        if ($code >= 500) $this->code = self::CODE_ERROR;
+        elseif ($code >= 400) $this->code = self::CODE_FAIL;
+        else $this->code = self::CODE_SUCCESS;
+
+        // 设置数据
+        if (isset($data)) $this->data = $data;
     }
 
     /**
@@ -33,7 +55,7 @@
      * @param Number $resCode
      */
     public function resetResCode($resCode) {
-      $this->code = $resCode;
+        $this->code = $resCode;
     }
 
     /**
@@ -48,27 +70,27 @@
      * @param String|Array $header
      */
     public function addHeader($header) {
-      if (!is_array($this->headers)) $this->headers = [];
+        if (!is_array($this->headers)) $this->headers = [];
 
-      if (is_string($header)) {
-        // 字符串类型
-        $this->headers[] = $header;
-        return;
-      }
-
-      if (is_array($header)) {
-        // 数组类型
-        foreach($header as $key => $value) {
-          if (is_int($key)) {
-            // 纯数组项
+        if (is_string($header)) {
+            // 字符串类型
             $this->headers[] = $header;
-            continue;
-          }
-
-          // 对象型
-          $this->headers[] = "$key: $value";
+            return;
         }
-      }
+
+        if (is_array($header)) {
+            // 数组类型
+            foreach($header as $key => $value) {
+                if (is_int($key)) {
+                    // 纯数组项
+                    $this->headers[] = $header;
+                    continue;
+                }
+
+                // 对象型
+                $this->headers[] = "$key: $value";
+            }
+        }
     }
 
     /**
@@ -76,8 +98,8 @@
      * 
      * @param String $msg
      */
-    public function setErrorMsg($msg = '请求失败') {
-      $this->error = $msg;
+    public function setErrorMsg($msg) {
+        $this->error = $msg;
     }
 
     /**
@@ -86,33 +108,33 @@
      * @param Array $data
      */
     public function appendData($data = []) {
-      foreach ($data as $key => $value) {
-        if (is_int($key)) $this->data[] = $value;
-        else $this->data[$key] = $value;
-      }
+        foreach ($data as $key => $value) {
+            if (is_int($key)) $this->data[] = $value;
+            else $this->data[$key] = $value;
+        }
     }
 
     // 返回数据
     public function end() {
-      // 设置返回状态码
-      $response = [
-        'code' => $this->code,
-      ];
+        // 设置返回状态码
+        $response = [
+            'code' => $this->code,
+        ];
 
-      // 设置返回数据
-      if ($this->code === self::$codeSuccess) $response['data'] = $this->data;
-      else $response['error'] = $this->error;
+        // 设置返回数据
+        if ($this->code === self::CODE_SUCCESS) $response['data'] = $this->data;
+        else $response['error'] = $this->error;
 
-      // 设置 HTTP code
-      http_response_code($this->httpCode);
+        // 设置 HTTP code
+        http_response_code($this->httpCode);
 
-      // 设置 HTTP header
-      for ($i = 0; $i < count($this->headers) - 1; $i ++) {
-        header($this->headers[$i]);
-      }
+        // 设置 HTTP header
+        for ($i = 0; $i < count($this->headers) - 1; $i ++) {
+            header($this->headers[$i]);
+        }
 
-      echo json_encode($response, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE);
-      // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）
-      exit();
+        echo json_encode($response, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE);
+        // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）
+        exit();
     }
-  }
+}
