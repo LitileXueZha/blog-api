@@ -1,14 +1,24 @@
 <?php
   class Request {
     function __construct() {
+      // 去掉 ? 之后的字符
+      $this->url = preg_replace('/(\??|\?.*)$/', '', $_SERVER['REQUEST_URI']);
       $this->method = $_SERVER['REQUEST_METHOD'];
-      $this->url = $_SERVER['REQUEST_URI'];
       $this->headers = self::getAllHeaders();
       $this->data = self::getData();
     }
 
     public static function getAllHeaders() {
       $headers = [];
+
+      foreach ($_SERVER as $key => $value) {
+        if (strpos($key, 'HTTP_') !== 0 ) continue;
+
+        // 处理 HTTP 头
+        $key = str_replace('HTTP_', '', $key);
+        // $key = strtolower($key);
+        $headers[$key] = $value;
+      }
 
       return $headers;
     }
