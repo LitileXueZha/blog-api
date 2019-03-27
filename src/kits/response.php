@@ -28,16 +28,17 @@ class Response
     // 返回 body 数据
     private $code;
     private $error = '请求失败';
-    private $data = [];
+    private $data;
 
 
     /**
      * 初始化
      * 
      * @param Number $code HTTP 状态码
-     * @param Array|Object $data 请求成功的数据（简写方式，也可通过 addData 添加）
+     * @param Array|Object $data 请求成功的数据（简写方式，也可通过 appendData 添加）
      */
-    function __construct($code, $data) {
+    public function __construct($code, $data = [])
+    {
         $this->httpCode = $code;
 
         // 定义返回 code
@@ -46,7 +47,7 @@ class Response
         else $this->code = self::CODE_SUCCESS;
 
         // 设置数据
-        if (isset($data)) $this->data = $data;
+        $this->data = $data;
     }
 
     /**
@@ -54,7 +55,8 @@ class Response
      * 
      * @param Number $resCode
      */
-    public function resetResCode($resCode) {
+    public function resetResCode($resCode)
+    {
         $this->code = $resCode;
     }
 
@@ -68,18 +70,19 @@ class Response
      * 3. 对象型数组。Exp: ['Content-Type' => 'application/json']
      * 
      * @param String|Array $header
+     * 
+     * @return void
      */
-    public function addHeader($header) {
-        if (!is_array($this->headers)) $this->headers = [];
-
+    public function addHeader($header)
+    {
+        // 字符串类型
         if (is_string($header)) {
-            // 字符串类型
             $this->headers[] = $header;
             return;
         }
 
+        // 数组类型
         if (is_array($header)) {
-            // 数组类型
             foreach($header as $key => $value) {
                 if (is_int($key)) {
                     // 纯数组项
@@ -98,7 +101,8 @@ class Response
      * 
      * @param String $msg
      */
-    public function setErrorMsg($msg) {
+    public function setErrorMsg($msg)
+    {
         $this->error = $msg;
     }
 
@@ -107,7 +111,8 @@ class Response
      * 
      * @param Array $data
      */
-    public function appendData($data = []) {
+    public function appendData(array $data = [])
+    {
         foreach ($data as $key => $value) {
             if (is_int($key)) $this->data[] = $value;
             else $this->data[$key] = $value;
@@ -115,7 +120,8 @@ class Response
     }
 
     // 返回数据
-    public function end() {
+    public function end()
+    {
         // 设置返回状态码
         $response = [
             'code' => $this->code,
@@ -133,7 +139,10 @@ class Response
             header($this->headers[$i]);
         }
 
+        // JSON_FORCE_OBJECT 将空数组转为 {}
+        // JSON_UNESCAPED_UNICODE 保持中文数据，不转 \uxxxx 类型
         echo json_encode($response, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE);
+
         // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）
         exit();
     }

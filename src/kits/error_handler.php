@@ -6,8 +6,11 @@
  * 在整个应用启动时 ErrorHandler::init()
  */
 
-require_once('./response.php');
-require_once('../constants/http_code.php');
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+
+require_once(__DIR__ .'/response.php');
+require_once(__DIR__ .'/../constants/http_code.php');
 
 class ErrorHandler
 {
@@ -16,17 +19,21 @@ class ErrorHandler
     const EXCEPTION = 200;
 
     protected static $types = [
-        self::ERROR => 'Error',
-        self::EXCEPTION => 'Exception',
+        self::ERROR => 'ERROR',
+        self::EXCEPTION => 'EXCEPTION',
     ];
 
-    public static function init() {
+    public static function init()
+    {
+        error_reporting(E_ALL | E_STRICT);
+
         // 设置全局捕获 Error 与 Exception
         self::handleError();
         self::handleException();
     }
 
-    public static function handleError() {
+    public static function handleError()
+    {
         /**
          * 全局错误捕获。文档：https://www.php.net/manual/zh/function.set-error-handler.php
          * 
@@ -47,7 +54,8 @@ class ErrorHandler
         });
     }
 
-    public static function handleException() {
+    public static function handleException()
+    {
         /**
          * 全局异常捕获。文档：https://www.php.net/manual/zh/function.set-exception-handler.php
          * 
@@ -60,8 +68,8 @@ class ErrorHandler
          */
         set_exception_handler(function ($e) {
             $err = [
-                'msg' => $e->getMessage(),
                 'code' => $e->getCode(),
+                'msg' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTrace(),
@@ -81,10 +89,33 @@ class ErrorHandler
      * @return void
      */
 
-    public static function exec($err, $code) {
-        $res = new Response(HttpCode::INTERNAL_SERVER_ERROR);
+    public static function exec($err, $code)
+    {
+        // 启用调试时，直接将数据输出到浏览器
+        if (DEBUG) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                self::$types[$code] => $err['msg'],
+                'file' => $err['file'],
+                'line' => $err['line'],
+                'trace' => $err['trace'],
+                'trace_str' => $err['trace_str'],
+            ]);
+            die();
+        }
 
-        $res->setErrorMsg($err);
+        // 生产环境记录错误日志
+        if (ENV === 'production') {
+            // logs
+            $log = new Logger('统一捕获');
+            $handler = new StreamHandler(__DIR__ .'/../../logs/error.log', Logger::ERROR);
+
+            $log->pushHandler($handler);
+            $log->error($err);
+        }
+
+        // 默认返回错误
+        $res = new Response(HttpCode::INTERNAL_SERVER_ERROR);
         $res->end();
     }
 }
