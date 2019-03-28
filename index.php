@@ -32,7 +32,7 @@ class App
         // self::$b = 3;
         // echo self::$b;
         $re = new Request();
-        throw new Exception('自定义');
+        throw new Exception('解析异常失败');
         $this->req = $req;
 
         global $HTTP_CODE;

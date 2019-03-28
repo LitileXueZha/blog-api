@@ -8,8 +8,10 @@
 
 use Monolog\Logger;
 use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\LineFormatter;
 
 require_once(__DIR__ .'/response.php');
+require_once(__DIR__ .'/log.php');
 require_once(__DIR__ .'/../constants/http_code.php');
 
 class ErrorHandler
@@ -93,25 +95,19 @@ class ErrorHandler
     {
         // 启用调试时，直接将数据输出到浏览器
         if (DEBUG) {
-            header('Content-Type: application/json');
-            echo json_encode([
+            Log::debug([
                 self::$types[$code] => $err['msg'],
                 'file' => $err['file'],
                 'line' => $err['line'],
                 'trace' => $err['trace'],
                 'trace_str' => $err['trace_str'],
             ]);
-            die();
         }
 
         // 生产环境记录错误日志
         if (ENV === 'production') {
             // logs
-            $log = new Logger('统一捕获');
-            $handler = new StreamHandler(__DIR__ .'/../../logs/error.log', Logger::ERROR);
-
-            $log->pushHandler($handler);
-            $log->error($err);
+            Log::error('统一捕获', $err['msg'], $err['file'], $err['line'], $err['trace_str']);
         }
 
         // 默认返回错误
