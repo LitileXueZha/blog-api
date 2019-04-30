@@ -26,8 +26,8 @@ class Request
      */
     public static function getUrl()
     {
-        // 去掉 ? 之后的字符
-        return preg_replace('/(\??|\?.*)$/', '', $_SERVER['REQUEST_URI']);
+        // 去掉 ? 之后的字符，并转化成小写
+        return strtolower(preg_replace('/(\??|\?.*)$/', '', $_SERVER['REQUEST_URI']));
     }
 
     /**

@@ -1,20 +1,36 @@
 <?php
 
+/**
+ * 应用
+ * 
+ * @example 直接 App::start() 即可
+ */
+
+require_once('./kits/request.php');
+
 class App
 {
-    public static $middleware = [];
-    public static $req = [];
-
-    function __construct($args) {
-        // 初始化一些东西
+    private static $middlewares = [];
+    private static $req = [];
+    
+    /**
+     * 启动此应用
+     */
+    public static function start($args)
+    {
+        // 1. 构造请求对象
+        self::$req = (array) new Request();
+        self::applyMiddleware();
     }
 
-    public static function start($args) {
-        // 启动此应用
-    }
-
-    public static function use($middleware) {
+    public static function use(Middleware $middleware)
+    {
         // 使用中间件，代码中的中间件可以定义为一个函数
-        static::$middleware[] = $middleware;
+        static::$middlewares[] = $middleware;
+    }
+
+    private static function applyMiddleware()
+    {
+        
     }
 }

@@ -10,8 +10,13 @@
  */
 
 $config = [
+    /**
+     * 生产环境：将错误写入日志文件
+     */
     'ENV' => 'production',
-    'DEBUG' => false,
+    // 将错误输出到浏览器。
+    // NOTE: 线上必须设置为 false！！！
+    'DEBUG' => true,
 
     'CORS' => 'https://wwww.ningtaostudy.cn',
 
