@@ -6,13 +6,9 @@
  * 在整个应用启动时 ErrorHandler::init()
  */
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\LineFormatter;
-
-require_once(__DIR__ .'/response.php');
-require_once(__DIR__ .'/log.php');
-require_once(__DIR__ .'/../constants/http_code.php');
+require_once(DIR_ROOT .'/src/kits/response.php');
+require_once(DIR_ROOT .'/src/kits/log.php');
+require_once(DIR_ROOT .'/src/kits/../constants/http_code.php');
 
 class ErrorHandler
 {

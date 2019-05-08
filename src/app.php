@@ -6,7 +6,10 @@
  * @example 直接 App::start() 即可
  */
 
-require_once('./kits/request.php');
+require_once(DIR_ROOT .'/src/kits/error_handler.php');
+require_once(DIR_ROOT .'/src/kits/log.php');
+require_once(DIR_ROOT .'/src/kits/request.php');
+require_once(DIR_ROOT .'/src/kits/response.php');
 
 class App
 {
@@ -16,11 +19,15 @@ class App
     /**
      * 启动此应用
      */
-    public static function start($args)
+    public static function start()
     {
-        // 1. 构造请求对象
+        // 1. 异常捕获
+        ErrorHandler::init();
+
+        // 2. 构造请求对象
         self::$req = (array) new Request();
         self::applyMiddleware();
+        Log::debug(self::$req);
     }
 
     public static function use(Middleware $middleware)
