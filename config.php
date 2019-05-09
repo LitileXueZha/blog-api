@@ -29,9 +29,28 @@ $config = [
     'DIR_ROOT' => __DIR__,
 ];
 
-// 通用设置
+/**
+ * 通用设置
+ * 
+ * + 时区
+ * + 自动加载类名
+ */
 date_default_timezone_set('Asia/Shanghai');
+spl_autoload_register(function ($className) {
+    $classDir = ['constants', 'interfaces', 'kits'];
+    $existClass = '不存在的类';
 
+    for ($i = 0; $i < 3; $i++) {
+        $file = "./src/$classDir[$i]/$className.php";
+
+        if (file_exists($file)) {
+            $existClass = $file;
+            break;
+        };
+    }
+
+    require_once $existClass;
+}, false);
 
 // 定义全局常量
 foreach ($config as $key => $value) {

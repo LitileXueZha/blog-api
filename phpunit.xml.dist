@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<phpunit colors="true">
+    <testsuites>
+        <testsuite name="单元测试（工具类）">
+            <directory>tests/kits/</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">src/kits/</directory>
+            <file>src/app.php</file>
+            <file>src/route.php</file>
+        </whitelist>
+    </filter>
+</phpunit>

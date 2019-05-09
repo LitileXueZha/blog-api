@@ -6,10 +6,6 @@
  * 在整个应用启动时 ErrorHandler::init()
  */
 
-require_once(DIR_ROOT .'/src/kits/response.php');
-require_once(DIR_ROOT .'/src/kits/log.php');
-require_once(DIR_ROOT .'/src/kits/../constants/http_code.php');
-
 class ErrorHandler
 {
     // 错误码定义

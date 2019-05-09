@@ -6,11 +6,6 @@
  * @example 直接 App::start() 即可
  */
 
-require_once(DIR_ROOT .'/src/kits/error_handler.php');
-require_once(DIR_ROOT .'/src/kits/log.php');
-require_once(DIR_ROOT .'/src/kits/request.php');
-require_once(DIR_ROOT .'/src/kits/response.php');
-
 class App
 {
     private static $middlewares = [];
