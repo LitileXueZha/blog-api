@@ -16,12 +16,12 @@ interface Middleware
      * @param App $app 整个应用对象
      * @param Function $next 执行下个中间件
      */
-    public function exec($app, $next);
+    public function execute($app, $next);
 
     /**
      * ”洋葱模型“ 后置逻辑
      * 
      * @param App $app 整个应用对象
      */
-    public function afterExec($app);
+    public function fallback($app);
 }

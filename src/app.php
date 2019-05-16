@@ -9,7 +9,7 @@
 class App
 {
     private static $middlewares = [];
-    private static $req = [];
+    public static $req = [];
     
     /**
      * 启动此应用
@@ -21,18 +21,40 @@ class App
 
         // 2. 构造请求对象
         self::$req = (array) new Request();
+
+        // 3. 应用中间件
         self::applyMiddleware();
-        Log::debug(self::$req);
+
+        // 4. 默认返回
+        echo '你好。';
     }
 
+    /**
+     * 使用中间件
+     * 
+     * + 只有放到 start 之前的中间件才会生效
+     * + 必须实现 Middleware 接口，否则报错
+     * 
+     * @param Middleware 中间件类
+     */
     public static function use(Middleware $middleware)
     {
-        // 使用中间件，代码中的中间件可以定义为一个函数
-        static::$middlewares[] = $middleware;
+        // 转化中间件 Object -> Function
+        // TM 直接用函数行不行？抄 koa 里的
+        self::$middlewares[] = function ($next) use ($middleware) {
+            return function () use ($next, $middleware) {
+                $middleware->execute(__CLASS__, function () use ($next, $middleware) {
+                    $next();
+                    $middleware->fallback(__CLASS__);
+                });
+            };
+        };
     }
 
     private static function applyMiddleware()
     {
-        
+        $middleware = Util::compose(self::$middlewares);
+
+        $middleware();
     }
 }

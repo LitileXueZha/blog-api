@@ -38,7 +38,7 @@ $config = [
 date_default_timezone_set('Asia/Shanghai');
 spl_autoload_register(function ($className) {
     $classDir = ['constants', 'interfaces', 'kits'];
-    $existClass = '不存在的类';
+    $existClass = "不存在的类：$className";
 
     for ($i = 0; $i < 3; $i++) {
         $file = "./src/$classDir[$i]/$className.php";
