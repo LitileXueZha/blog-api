@@ -44,7 +44,11 @@ class ErrorHandler
                 'line' => $errline,
             ];
 
-            self::exec($err, self::ERROR);
+            // 保证错误格式一致。额外的操作
+            $err['trace'] = null;
+            $err['trace_str'] = null;
+
+            self::execute($err, self::ERROR);
         });
     }
 
@@ -70,7 +74,7 @@ class ErrorHandler
                 'trace_str' => $e->getTraceAsString(),
             ];
 
-            self::exec($err, self::EXCEPTION);
+            self::execute($err, self::EXCEPTION);
         });
     }
 
@@ -83,7 +87,7 @@ class ErrorHandler
      * @return void
      */
 
-    public static function exec($err, $code)
+    public static function execute($err, $code)
     {
         // 启用调试时，直接将数据输出到浏览器
         if (DEBUG) {

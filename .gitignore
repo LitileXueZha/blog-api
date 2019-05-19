@@ -1,6 +1,8 @@
 .vscode/
 vendor/
 coverage/
+.scannerwork/
 composer.lock
+.phpunit.result.cache
 
 logs/
