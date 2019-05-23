@@ -5,36 +5,15 @@ require_once('./config.php');
 
 require_once('./src/app.php');
 
-class AuthMiddleware implements Middleware
-{
-    public function execute($app, $next)
-    {
-        $atk = $app::$req['headers']['ATK'];
-        if (empty($app::$req['headers']['ATK'])) {
-            // 未认证
-            $res = new Response(HttpCode::UNAUTHORIZED);
-            $res->setErrorMsg('未认证');
-            $res->end();
-        }
-        
-        
-        $atk = $app::$req['headers']['ATK'];
+use Middleware\Auth;
 
-        if ($atk !== 'tao') {
-            // token 签名校验失败
-            $res = new Response(HttpCode::UNAUTHORIZED);
-            $res->setErrorMsg('认证失败');
-            $res->end();
-        }
-        $next();
-    }
+$route = new Route();
+// var_dump($route);
+// exit();
 
-    public function fallback($app)
-    {
-        // Nothing.
-    }
-}
 
-App::use(new AuthMiddleware);
+$route->get('/user', 'daf')->post('/', 'aa')->delete('/user', 'daf')->get('/user/:id', '路径参数')->get('/example/**', '通配符');
+
+App::use(new Auth);
 
 App::start();

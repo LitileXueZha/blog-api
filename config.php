@@ -38,18 +38,23 @@ $config = [
 date_default_timezone_set('Asia/Shanghai');
 spl_autoload_register(function ($className) {
     $classDir = ['constants', 'interfaces', 'kits'];
-    $existClass = "不存在的类：$className";
 
     for ($i = 0; $i < 3; $i++) {
         $file = "./src/$classDir[$i]/$className.php";
 
         if (file_exists($file)) {
-            $existClass = $file;
-            break;
+            require_once $file;
+            return;
         };
     }
 
-    require_once $existClass;
+    // 命名空间类加载
+    $className = str_replace('\\', '/', $className);
+    $file = "./src/$className.php";
+
+    if (file_exists($file)) {
+        require_once $file;
+    }
 }, false);
 
 // 定义全局常量

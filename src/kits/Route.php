@@ -17,44 +17,18 @@ class Route
     /**
      * @var String 路由前缀
      */
-    private $prefix = '';
-    // 允许方法
-    private $allowMethods = [];
+    private $prefix = '/';
+    // 路由配置
     public $stack = [];
 
     /**
      * 初始化
      * 
-     * @param String $prefix 路由前缀。默认为 ''
+     * @param String $prefix 路由前缀。默认为 '/'
      */
-    function __construct($prefix = '', $allowMethods = ['options', 'head', 'get', 'post', 'put', 'delete'])
+    function __construct($prefix = '/')
     {
         $this->prefix = $prefix;
-        $this->allowMethods = $allowMethods;
-
-        $this->registerMethods();
-    }
-
-    /**
-     * 注册实例可使用的方法
-     * 
-     * 默认方法为全部的 options、head、get、post、put、delete
-     * 
-     * 可在实例化时传入，例如：new Route('', ['get', 'post'])
-     */
-    private function registerMethods()
-    {
-        $len = count($this->allowMethods);
-
-        for ($i = 0; $i < $len; $i ++) {
-            $method = $this->allowMethods[$i];
-
-            $this->$method = function ($url, $controller) {
-                $this->register($url, strtoupper($mehtod), $controller);
-                
-                return $this;
-            };
-        }
     }
 
     /**
@@ -66,43 +40,129 @@ class Route
      */
     private function register($url, $method, $controller)
     {
-        $arr = split('/', $url);
+        $arr = explode('/', $this->prefix . $url);
         $len = count($arr);
-        $stack = [];
-        $tmpStack = &$stack;
+        $stack = &$this->stack;
 
         for ($i = 0; $i < $len; $i ++) {
             $str = $arr[$i];
+            
+            // 过滤空字符串
+            if (!$str) continue;
+
+            $stack = &$stack['children'];
 
             if (strpos($str, ':') === 0) {
-                // 路径参数
-                $stack[$method]['*'] = [
-                    'controller' => $controller,
-                    'param' => substr($str, 1),
-                ];
-            } else {
-                // 通配符、严格路径
-                $stack[$method]['**'] = ['controller' => $controller];
+                $stack['*']['param'] = substr($str, 1);
+                $str = '*';
             }
 
-            $tmpStack = $tmpStack['children'];
+            $stack = &$stack[$str];
         }
-        
-        unset($tmpStack['children']);
+
+        $stack[$method]['controller'] = $controller;
+    }
+
+    /**
+     * 路由方法 OPTIONS
+     * 
+     * @param String $url 路径名
+     * @param String $controller 路由对应逻辑
+     * 
+     * @return Route
+     */
+    public function options($url, $controller)
+    {
+        $this->register($url, 'OPTIONS', $controller);
+
+        return $this;
+    }
+
+    /**
+     * 路由方法 HEAD
+     * 
+     * @param String $url 路径名
+     * @param String $controller 路由对应逻辑
+     * 
+     * @return Route
+     */
+    public function head($url, $controller)
+    {
+        $this->register($url, 'HEAD', $controller);
+
+        return $this;
+    }
+
+    /**
+     * 路由方法 GET
+     * 
+     * @param String $url 路径名
+     * @param String $controller 路由对应逻辑
+     * 
+     * @return Route
+     */
+    public function get($url, $controller)
+    {
+        $this->register($url, 'GET', $controller);
+
+        return $this;
+    }
+
+    /**
+     * 路由方法 POST
+     * 
+     * @param String $url 路径名
+     * @param String $controller 路由对应逻辑
+     * 
+     * @return Route
+     */
+    public function post($url, $controller)
+    {
+        $this->register($url, 'POST', $controller);
+
+        return $this;
+    }
+
+    /**
+     * 路由方法 PUT
+     * 
+     * @param String $url 路径名
+     * @param String $controller 路由对应逻辑
+     * 
+     * @return Route
+     */
+    public function put($url, $controller)
+    {
+        $this->register($url, 'PUT', $controller);
+
+        return $this;
+    }
+
+    /**
+     * 路由方法 DELETE
+     * 
+     * @param String $url 路径名
+     * @param String $controller 路由对应逻辑
+     * 
+     * @return Route
+     */
+    public function delete($url, $controller)
+    {
+        $this->register($url, 'DELETE', $controller);
+
+        return $this;
     }
 }
 
+class RouteMiddleware
+{
+    private static $stack = [];
+    function __construct(...$args)
+    {
 
-try {
-    $route = new Route();
-    // var_dump($route);
-    // exit();
-    
-
-    var_dump(($route->get)());
-    $route->get('/user', 'daf')->post()->delete();
-    
-    Log::debug($route);
-} catch (Throwable $e) {
-    var_dump($e);
+    }
+    function execute($app)
+    {
+        $url = $app::$req['url'];
+    }
 }
