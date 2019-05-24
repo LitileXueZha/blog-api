@@ -5,8 +5,6 @@ require_once('./config.php');
 
 require_once('./src/app.php');
 
-use Middleware\Auth;
-
 $route = new Route();
 // var_dump($route);
 // exit();

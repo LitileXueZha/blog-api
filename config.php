@@ -37,23 +37,15 @@ $config = [
  */
 date_default_timezone_set('Asia/Shanghai');
 spl_autoload_register(function ($className) {
-    $classDir = ['constants', 'interfaces', 'kits'];
+    $classDir = ['constants', 'interfaces', 'kits', 'middleware'];
 
-    for ($i = 0; $i < 3; $i++) {
+    for ($i = 0; $i < 4; $i++) {
         $file = "./src/$classDir[$i]/$className.php";
 
         if (file_exists($file)) {
             require_once $file;
             return;
         };
-    }
-
-    // 命名空间类加载
-    $className = str_replace('\\', '/', $className);
-    $file = "./src/$className.php";
-
-    if (file_exists($file)) {
-        require_once $file;
     }
 }, false);
 
