@@ -10,6 +10,22 @@
  * 路径参数优先级比通配符高。
  * 
  * @example 可链式调用：(new Route()).get('/').post('/user')
+ * 
+ * 路由结构
+ * 
+ * ```php
+ * $unit = [
+ *  'param'? => '',
+ *  'methods' => [
+ *      'GET' => ['controller' => Funcion]
+ *  ],
+ *  'children'? => [
+ *      '$url' => $unit,
+ *  ],
+ * ];
+ * ```
+ * 
+ * 如果路径寻找完成后，没发现 methods 里的 HTTP 方法，可视为未定义此路由，返回 404
  */
 
 class Route
@@ -42,8 +58,10 @@ class Route
     {
         $arr = explode('/', $this->prefix . $url);
         $len = count($arr);
+        // NOTE: 必须是引用赋值
         $stack = &$this->stack;
 
+        // 将当前路由加入到配置中
         for ($i = 0; $i < $len; $i ++) {
             $str = $arr[$i];
             
@@ -60,7 +78,7 @@ class Route
             $stack = &$stack[$str];
         }
 
-        $stack[$method]['controller'] = $controller;
+        $stack['methods'][$method]['controller'] = $controller;
     }
 
     /**
@@ -151,18 +169,5 @@ class Route
         $this->register($url, 'DELETE', $controller);
 
         return $this;
-    }
-}
-
-class RouteMiddleware
-{
-    private static $stack = [];
-    function __construct(...$args)
-    {
-
-    }
-    function execute($app)
-    {
-        $url = $app::$req['url'];
     }
 }

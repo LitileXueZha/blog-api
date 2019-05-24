@@ -9,9 +9,19 @@ $route = new Route();
 // var_dump($route);
 // exit();
 
+function aa($req) {
+    Log::debug($req);
+}
 
-$route->get('/user', 'daf')->post('/', 'aa')->delete('/user', 'daf')->get('/user/:id', '路径参数')->get('/example/**', '通配符');
+$route
+->get('/no', 'aa')
+->get('/user', 'aa')
+->delete('/user', 'aa')
+->get('/user/:id', 'aa')
+->get('/example/**', 'aa')
+->get('/', 'aa');
 
 App::use(new Auth);
+App::use(new RouteMiddleware($route));
 
 App::start();
