@@ -12,12 +12,20 @@ class Auth implements Middleware
 {
     public function execute($app, $next)
     {
-        // $atk = $app::$req['headers']['ATK'];
+        if ($app::$req['method'] === 'OPTIONS') {
+            header('Access-Control-Allow-Headers: atk');
+            header('Access-Control-Allow-Origin: *');
+            // 取消跳转剩下的中间件，直接跳过
+            // $next();
+            return;
+        }
+
         if (empty($app::$req['headers']['ATK'])) {
             // 未认证
             $res = new Response(HttpCode::UNAUTHORIZED);
             $res->setErrorMsg('未认证');
             $res->end();
+            return;
         }
         
         
@@ -28,7 +36,10 @@ class Auth implements Middleware
             $res = new Response(HttpCode::UNAUTHORIZED);
             $res->setErrorMsg('认证失败');
             $res->end();
+            return;
         }
+
+        // 校验通过，进入下个中间件
         $next();
     }
 
