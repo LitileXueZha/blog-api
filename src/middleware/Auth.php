@@ -13,8 +13,8 @@ class Auth implements Middleware
     public function execute($app, $next)
     {
         if ($app::$req['method'] === 'OPTIONS') {
-            header('Access-Control-Allow-Headers: atk');
-            header('Access-Control-Allow-Origin: *');
+            $res = new Response(HttpCode::OK);
+            $res->end();
             // 取消跳转剩下的中间件，直接跳过
             // $next();
             return;

@@ -22,7 +22,7 @@ class Response
         // 跨域
         'Access-Control-Allow-Origin: *',
         'Access-Control-Allow-Methods: OPTIONS,HEAD,GET,POST,PUT,DELETE',
-        'Access-Control-Allow-Headers: *',
+        'Access-Control-Allow-Headers: atk',
     ];
 
     // 返回 body 数据
@@ -135,7 +135,9 @@ class Response
         http_response_code($this->httpCode);
 
         // 设置 HTTP header
-        for ($i = 0; $i < count($this->headers) - 1; $i ++) {
+        $len = count($this->headers);
+
+        for ($i = 0; $i < $len; $i ++) {
             header($this->headers[$i]);
         }
 
