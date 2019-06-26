@@ -3,7 +3,7 @@
 /**
  * 鉴权
  * 
- * + 在 header 中携带 atk 参数
+ * + 在 header 中携带 Authorization 参数
  * + 签名
  * + 跳过 OPTIONS 请求
  */
@@ -20,7 +20,7 @@ class Auth implements Middleware
             return;
         }
 
-        if (empty($app::$req['headers']['ATK'])) {
+        if (empty($app::$req['headers']['AUTHORIZATION'])) {
             // 未认证
             $res = new Response(HttpCode::UNAUTHORIZED);
             $res->setErrorMsg('未认证');
@@ -29,7 +29,7 @@ class Auth implements Middleware
         }
         
         
-        $atk = $app::$req['headers']['ATK'];
+        $atk = $app::$req['headers']['AUTHORIZATION'];
 
         if ($atk !== 'tao') {
             // token 签名校验失败

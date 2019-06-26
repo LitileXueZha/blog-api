@@ -22,7 +22,7 @@ class Response
         // 跨域
         'Access-Control-Allow-Origin: *',
         'Access-Control-Allow-Methods: OPTIONS,HEAD,GET,POST,PUT,DELETE',
-        'Access-Control-Allow-Headers: atk',
+        'Access-Control-Allow-Headers: Authorization,Content-Type',
     ];
 
     // 返回 body 数据

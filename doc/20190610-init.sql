@@ -91,6 +91,7 @@ COMMENT='评论表';
 -- 创建标签表 tag
 CREATE TABLE `tag` (
     `id` int(4) NOT NULL AUTO_INCREMENT,
+    -- 大小写敏感
     `name` varchar(16) NOT NULL COLLATE utf8mb4_bin COMMENT '标签名',
     `display_name` varchar(64) NOT NULL COMMENT '展示标签名',
     `click` int(8) DEFAULT 0 COMMENT '点击量',
@@ -106,6 +107,5 @@ CREATE TABLE `tag` (
 )
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4
--- 大小写敏感
 COLLATE=utf8mb4_general_ci
 COMMENT '标签表';
