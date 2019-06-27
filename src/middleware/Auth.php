@@ -31,7 +31,7 @@ class Auth implements Middleware
         
         $atk = $app::$req['headers']['AUTHORIZATION'];
 
-        if ($atk !== 'tao') {
+        if ($atk !== 'Bearer tao') {
             // token 签名校验失败
             $res = new Response(HttpCode::UNAUTHORIZED);
             $res->setErrorMsg('认证失败');

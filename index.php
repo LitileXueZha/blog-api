@@ -24,7 +24,7 @@ function aa($req) {
 $route
     // 文章相关
     ->get('/article', 'aa') // 获取文章列表
-    ->post('/article', 'aa') // 创建文章
+    ->post('/article', 'Article::add') // 创建文章
     ->get('/article/:id', 'aa') // 获取单个文章
     ->put('/article/:id', 'aa') // 更新单个文章
     ->delete('/article/:id', 'aa') // 删除单个文章

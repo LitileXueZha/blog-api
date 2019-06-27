@@ -10,6 +10,17 @@ use TC\Model\Article as ModelArticle;
 
 class Article
 {
+    private static $mod;
+
+    private static function getModel()
+    {
+        if (empty(static::$mod)) {
+            static::$mod = new ModelArticle();
+        }
+
+        return static::$mod;
+    }
+
     /**
      * 添加一篇文章
      * 
@@ -17,8 +28,9 @@ class Article
      */
     public static function add($req)
     {
+        $db = new ModelArticle();
         $data = $req['data'];
 
-        Log::debug($data);
+        Log::debug(static::$db);
     }
 }

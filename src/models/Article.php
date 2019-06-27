@@ -8,7 +8,7 @@ namespace TC\Model;
 
 require_once __DIR__.'/DB.php';
 
-class Article extends DB
+class Article
 {
     /**
      * 数据库表名称
@@ -16,13 +16,18 @@ class Article extends DB
      * @var String
      */
     const NAME = 'article';
-    // 本次连接
+    
+    /**
+     * 本次数据库连接
+     * 
+     * @var \PDO
+     */
     private $dbh = null;
 
     function __construct()
     {
         // 连接数据库
-        $dbh = super::connect();
+        $dbh = DB::init();
 
         $this->dbh = $dbh;
     }
