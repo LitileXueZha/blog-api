@@ -4,14 +4,16 @@
  * 文章 - 数据模型
  */
 
-require_once('./DB.php');
+namespace TC\Model;
 
-namespace \TC\Model;
+require_once __DIR__.'/DB.php';
 
 class Article extends DB
 {
     /**
-     * @var String 数据库表名称
+     * 数据库表名称
+     * 
+     * @var String
      */
     const NAME = 'article';
     // 本次连接
@@ -20,7 +22,7 @@ class Article extends DB
     function __construct()
     {
         // 连接数据库
-        $dbh = super.connect();
+        $dbh = super::connect();
 
         $this->dbh = $dbh;
     }
@@ -43,4 +45,5 @@ class Article extends DB
 
         return $this;
     }
+
 }

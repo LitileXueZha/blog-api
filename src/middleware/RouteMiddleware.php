@@ -11,7 +11,9 @@
 class RouteMiddleware implements Middleware
 {
     /**
-     * @var Array 路由配置
+     * 路由配置
+     * 
+     * @var Array
      */
     private $stack = [];
 

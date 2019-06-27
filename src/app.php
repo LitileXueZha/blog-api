@@ -8,8 +8,19 @@
 
 class App
 {
-    private static $middlewares = [];
-    public static $req = [];
+    /**
+     * 中间件
+     * 
+     * @var Array
+     */
+    private static $middlewares;
+
+    /**
+     * 请求信息
+     * 
+     * @var Array
+     */
+    public static $req;
     
     /**
      * 启动此应用

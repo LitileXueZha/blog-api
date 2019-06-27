@@ -1,15 +1,20 @@
 <?php
 
-require_once('./vendor/autoload.php');
-require_once('./config.php');
+/**
+ * 定义了一个 `public` 目录以存放入口文件
+ * 
+ * 像下面、`src` 等核心文件不能暴露出来，参考了 Laravel 的做法
+ */
 
-require_once('./src/app.php');
+require_once __DIR__.'/vendor/autoload.php';
+require_once __DIR__.'/config.php';
+
+require_once __DIR__.'/src/app.php';
+require_once __DIR__.'/src/controllers/Article.php';
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
 $route = new Route('/v1');
-// var_dump($route);
-// exit();
 
 function aa($req) {
     $res = new Response(HttpCode::OK, $req);
@@ -34,5 +39,3 @@ $route
 
 App::use(new Auth);
 App::use(new RouteMiddleware($route));
-
-App::start();

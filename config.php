@@ -16,7 +16,7 @@ $config = [
     'ENV' => 'production',
     // 将错误输出到浏览器。
     // NOTE: 线上必须设置为 false！！！
-    'DEBUG' => true,
+    'DEBUG' => false,
 
     'CORS' => 'https://wwww.ningtaostudy.cn',
 
@@ -25,8 +25,6 @@ $config = [
     'DB_NAME' => 'blog',
     'DB_USER' => 'root',
     'DB_PASSWORD' => '123456',
-
-    'DIR_ROOT' => __DIR__,
 ];
 
 /**
@@ -40,7 +38,7 @@ spl_autoload_register(function ($className) {
     $classDir = ['constants', 'interfaces', 'kits', 'middleware'];
 
     for ($i = 0; $i < 4; $i++) {
-        $file = "./src/$classDir[$i]/$className.php";
+        $file = __DIR__."/src/$classDir[$i]/$className.php";
 
         if (file_exists($file)) {
             require_once $file;

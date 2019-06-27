@@ -4,6 +4,8 @@
  * 数据库连接
  */
 
+namespace TC\Model;
+
 class DB
 {
     function __construct()

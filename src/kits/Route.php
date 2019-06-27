@@ -31,7 +31,9 @@
 class Route
 {
     /**
-     * @var String 路由前缀
+     * 路由前缀
+     * 
+     * @var String
      */
     private $prefix = '/';
     // 路由配置
