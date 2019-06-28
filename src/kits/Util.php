@@ -46,4 +46,23 @@ final class Util
             };
         })($anonymous);
     }
+
+    /**
+     * 数据格式校验
+     * 
+     * @param Array 数据
+     * @param Array 校验规则
+     * @return String 错误提示。全部校验成功则为空
+     */
+    public static function validate($data, $rules)
+    {
+        // 循环校验
+        foreach ($data as $key => $value) {
+            $rule = $rules[$key];
+            $type = $rules['type'];
+        }
+
+        // 全部校验成功
+        return '';
+    }
 }

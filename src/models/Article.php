@@ -16,21 +16,13 @@ class Article
      * @var String
      */
     const NAME = 'article';
-    
+
     /**
-     * 本次数据库连接
+     * 预处理语句集
      * 
-     * @var \PDO
+     * @var Array
      */
-    private $dbh = null;
-
-    function __construct()
-    {
-        // 连接数据库
-        $dbh = DB::init();
-
-        $this->dbh = $dbh;
-    }
+    protected static $sql;
 
     /**
      * 添加一条文章
@@ -38,17 +30,27 @@ class Article
      * @param Array 文章数据
      * @return this
      */
-    public function add($data)
+    public static function add($data)
     {
-        $sql = $this->ppAdd;
-        $tb = static::NAME;
+        $db = DB::init();
+        $tb = self::NAME;
 
-        if (empty($sql)) {
-            // 定义预处理语句
-            $sql = $this->dbh->prepare("INSERT INTO $tb (title, summary, content, tag, )");
+        // 定义预处理语句
+        if (empty(self::$sql['add'])) {
+            $statement = "INSERT INTO $tb (title, summary, content, tag, category, bg, article_id)
+                        VALUES (:title, :summary, :content, :tag, :category, :bg, :article_id)";
+            self::$sql['add'] = $db->prepare($statement);
         }
 
-        return $this;
+        $sql = self::$sql['add'];
+        
+        // 绑定参数
+        foreach ($data as $key => $value) {
+            $sql->bindParam(":$key", $value);
+        }
+
+        // 插入数据
+        $sql->execute();
     }
 
 }

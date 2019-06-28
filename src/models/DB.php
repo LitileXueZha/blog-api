@@ -6,12 +6,14 @@
 
 namespace TC\Model;
 
+use PDO;
+
 class DB
 {
     /**
      * 连接实例
      * 
-     * @var \PDO
+     * @var PDO
      */
     private static $db;
 
@@ -21,7 +23,7 @@ class DB
     /**
      * 获取连接实例
      * 
-     * @return \PDO
+     * @return PDO
      */
     public static function init()
     {
@@ -35,7 +37,7 @@ class DB
     /**
      * 数据库连接
      * 
-     * @return \PDO 数据库实例
+     * @return PDO 数据库实例
      */
     public static function connect()
     {
@@ -43,7 +45,7 @@ class DB
         $port = DB_PORT;
         $dbname = DB_NAME;
         $dsn = "mysql:host=$host;port=$port;dbname=$dbname";
-        $db = new \PDO($dsn, DB_USER, DB_PASSWORD);
+        $db = new PDO($dsn, DB_USER, DB_PASSWORD);
 
         self::$connecting = true;
         self::$db = &$db;
