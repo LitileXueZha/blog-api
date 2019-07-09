@@ -40,7 +40,9 @@ class Request
         $headers = [];
 
         foreach ($_SERVER as $key => $value) {
-            if (strpos($key, 'HTTP_') !== 0 ) continue;
+            if (strpos($key, 'HTTP_') !== 0 ) {
+                continue;
+            }
 
             // 处理 HTTP 头
             $key = str_replace('HTTP_', '', $key);
@@ -86,7 +88,9 @@ class Request
             $data = $_POST;
             
             // 如果 $_POST 拿不到，得要从 php://input 中拿
-            if (!$data) $data = json_decode(file_get_contents('php://input'), true);
+            if (!$data) {
+                $data = json_decode(file_get_contents('php://input'), true);
+            }
 
             return $data;
         }

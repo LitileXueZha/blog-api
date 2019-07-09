@@ -29,9 +29,11 @@ final class Util
     {
         $len = count($middlewares);
         // new Closure 会报错
-        $anonymous = function () {};
+        $anonymous = function () {/** empty */};
 
-        if ($len === 0) return $anonymous;
+        if ($len === 0) {
+            return $anonymous;
+        }
 
         if ($len === 1) {
             return $middlewares[0]($anonymous);
@@ -39,7 +41,9 @@ final class Util
         
         return array_reduce($middlewares, function ($f, $g) {
             // PHP 中 reduce 函数第三个入参为 null
-            if (is_null($f)) return $g;
+            if (is_null($f)) {
+                return $g;
+            }
 
             return function ($next) use ($f, $g) {
                 return $f($g($next));
@@ -60,7 +64,7 @@ final class Util
         foreach ($data as $key => $value) {
             $rule = $rules[$key];
             $type = $rule['type'];
-            // TODO:
+            // TODO: 待做
         }
 
         // 全部校验成功

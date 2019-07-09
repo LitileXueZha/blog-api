@@ -42,7 +42,9 @@ class Log
         $traceStr = $log['trace_str'];
 
         // 与生成的 traceString 保持一致
-        if (is_null($traceStr)) $traceStr = "#0 $file($line)";
+        if (is_null($traceStr)) {
+            $traceStr = "#0 $file($line)";
+        }
 
         $logger = new Logger("$channel.$type");
         $handler = new StreamHandler(self::$files[$type]);
