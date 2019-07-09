@@ -61,4 +61,21 @@ class DB
         self::$db = null;
         self::$connecting = false;
     }
+
+    /**
+     * 生成短链型 id
+     * 
+     * 所有数据，统一使用此 short_id 表里的
+     */
+    public static function shortId()
+    {
+        $db = self::init();
+        $tb = 'short_id';
+        $sql = "SELECT MAX(id) FROM $tb";
+
+        $query = $db->query($sql);
+        $max = $query->fetch();
+
+        $id = $max[0];
+    }
 }

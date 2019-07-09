@@ -18,13 +18,6 @@ class Article
     const NAME = 'article';
 
     /**
-     * 预处理语句集
-     * 
-     * @var Array
-     */
-    protected static $sql;
-
-    /**
      * 添加一条文章
      * 
      * @param Array 文章数据
@@ -34,15 +27,10 @@ class Article
     {
         $db = DB::init();
         $tb = self::NAME;
+        $statement = "INSERT INTO $tb (title, summary, content, tag, category, bg, article_id)
+                    VALUES (:title, :summary, :content, :tag, :category, :bg, :article_id)";
 
-        // 定义预处理语句
-        if (empty(self::$sql['add'])) {
-            $statement = "INSERT INTO $tb (title, summary, content, tag, category, bg, article_id)
-                        VALUES (:title, :summary, :content, :tag, :category, :bg, :article_id)";
-            self::$sql['add'] = $db->prepare($statement);
-        }
-
-        $sql = self::$sql['add'];
+        $sql = $db->prepare($statement);
         
         // 绑定参数
         foreach ($data as $key => $value) {

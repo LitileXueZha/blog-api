@@ -59,10 +59,51 @@ final class Util
         // 循环校验
         foreach ($data as $key => $value) {
             $rule = $rules[$key];
-            $type = $rules['type'];
+            $type = $rule['type'];
+            // TODO:
         }
 
         // 全部校验成功
         return '';
+    }
+
+    /**
+     * 短链 id 生成
+     * 
+     * 采用 62 进制 (a-zA-Z0-9)，将数字转成对应字符串
+     * 
+     * @example 11 => a2dsax
+     * 
+     * @param Number 数字
+     */
+    public static function shortId($num)
+    {
+        // 62 进制
+        $hex = [ 
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+        ];
+        $len = count($hex);
+        // 短链 id
+        $id = '';
+
+        do {
+            $index = $num % $len;
+            $left = intval($num / $len);
+
+            // 还能继续被整除，取能被整除的余数
+            if ($left !== 0) {
+                $index = $num % $len;
+            }
+
+            // 拼接
+            $id = $hex[$index].$id;
+            $num = $left;
+        } while ($num > 0);
+
+        return $id;
     }
 }

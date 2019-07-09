@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<phpunit colors="true">
+<phpunit bootstrap="config.php" colors="true">
     <testsuites>
         <testsuite name="单元测试（工具类）">
             <directory>tests/kits/</directory>

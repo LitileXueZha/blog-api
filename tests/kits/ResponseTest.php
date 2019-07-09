@@ -10,6 +10,8 @@ class ResponseTest extends \PHPUnit\Framework\TestCase
      */
     public function testConstructor()
     {
-        $this->assertCount(0, [1]);
+        $res = new Response(200);
+
+        $this->assertInstanceOf(Response::class, $res);
     }
 }
