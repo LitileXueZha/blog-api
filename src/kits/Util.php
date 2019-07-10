@@ -62,7 +62,20 @@ final class Util
     {
         // 循环校验
         foreach ($data as $key => $value) {
+            if (empty($rules[$key])) {
+                continue;
+            }
+
             $rule = $rules[$key];
+
+            
+
+            if (empty($rule['type']) && is_array($rule)) {
+                // 多重规则
+                foreach ($rule as $value) {
+                    $type = $value['type'];
+                }
+            }
             $type = $rule['type'];
             // TODO: 待做
         }

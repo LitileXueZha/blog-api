@@ -7,6 +7,7 @@
 namespace TC\Model;
 
 use PDO;
+use Util;
 
 class DB
 {
@@ -65,17 +66,21 @@ class DB
     /**
      * 生成短链型 id
      * 
-     * 所有数据，统一使用此 short_id 表里的
+     * 所有数据，统一使用此 count 表里的
+     * 
+     * @return String 短链型 id
      */
     public static function shortId()
     {
         $db = self::init();
-        $tb = 'short_id';
-        $sql = "SELECT MAX(id) FROM $tb";
+        $tb = 'count';
+        $sql = "INSERT INTO $tb VALUES ()";
 
         $query = $db->query($sql);
-        $max = $query->fetch();
+        $num = $db->lastInsertId();
 
-        $id = $max[0];
+        $id = Util::shortId($num);
+
+        return $id;
     }
 }
