@@ -9,6 +9,17 @@
 final class Util
 {
     /**
+     * 数据校验的默认规则
+     * 
+     * @var Array
+     */
+    protected static $validateRule = [
+        'type' => 'string',
+        'required' => false,
+        'error' => '数据格式不正确',
+    ];
+
+    /**
      * 中间件合成
      * 
      * 合成下面函数，递归调用，形成"洋葱"模型
@@ -56,32 +67,93 @@ final class Util
      * 
      * @param Array 数据
      * @param Array 校验规则
-     * @return String 错误提示。全部校验成功则为空
+     * @return String|NULL 错误提示。全部校验成功则为 NULL
      */
-    public static function validate($data, $rules)
+    public static function validate($source, $rules)
     {
-        // 循环校验
-        foreach ($data as $key => $value) {
-            if (empty($rules[$key])) {
-                continue;
+        foreach ($rules as $key => $value) {
+            if (isset($value['type'])) {
+                // 单个规则转化成多规则形式
+                $value = [$value];
             }
 
-            $rule = $rules[$key];
+            foreach ($value as $val) {
+                // 默认规则设置
+                $rule = array_merge(self::$validateRule, $val);
 
-            
+                $type = $rule['type'];
+                $required = $rule['required'];
+                $error = $rule['error'];
 
-            if (empty($rule['type']) && is_array($rule)) {
-                // 多重规则
-                foreach ($rule as $value) {
-                    $type = $value['type'];
+                // required 必填校验
+                if ($required && empty($source[$key])) {
+                    return $error;
+                }
+
+                // NOTE: 这里没有做空 key 校验，需要自己规范
+                $data = $source[$key];
+
+                // type 校验。只做了基本类型
+                switch ($type) {
+                    case 'string':
+                        if (is_string($data)) {
+                            break;
+                        }
+
+                        return $error;
+                    case 'number':
+                        if (is_numeric($data)) {
+                            break;
+                        }
+
+                        return $error;
+                    case 'bool':
+                        if (is_bool($data)) {
+                            break;
+                        }
+
+                        return $error;
+                    case 'enum':
+                        if (in_array($data, $rule['enum'])) {
+                            break;
+                        }
+
+                        return $error;
+                    case 'array':
+                        if (is_array($data)) {
+                            break;
+                        }
+
+                        return $error;
+                    case 'email':
+                        if (filter_var($data, FILTER_VALIDATE_EMAIL)) {
+                            break;
+                        }
+
+                        return $error;
+                    case 'url':
+                        if (filter_var($data, FILTER_VALIDATE_URL)) {
+                            break;
+                        }
+
+                        return $error;
+                }
+
+                // pattern 正则校验
+                if (isset($rule['pattern'])) {
+                    $count = preg_match($rule['pattern'], $data);
+
+                    if ($count === 0) return $error;
+                }
+
+                // validator 自定义函数校验
+                if (isset($rule['validator'])) {
+                    $result = $rule['validator']($data);
+
+                    if ($result) return $result;
                 }
             }
-            $type = $rule['type'];
-            // TODO: 待做
         }
-
-        // 全部校验成功
-        return '';
     }
 
     /**
