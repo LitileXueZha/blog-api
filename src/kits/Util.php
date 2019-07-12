@@ -85,12 +85,16 @@ final class Util
                 $required = $rule['required'];
                 $error = $rule['error'];
 
+                $isEmpty = !array_key_exists($key, $source);
+
                 // required 必填校验
-                if ($required && empty($source[$key])) {
+                if ($required && $isEmpty) {
                     return $error;
                 }
 
-                // NOTE: 这里没有做空 key 校验，需要自己规范
+                // 无数据且 required 为 false，不进行校验
+                if ($isEmpty) continue;
+
                 $data = $source[$key];
 
                 // type 校验。只做了基本类型

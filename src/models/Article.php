@@ -27,17 +27,14 @@ class Article
     {
         $db = DB::init();
         $tb = self::NAME;
-        $column = array_keys($data);
 
-        // 添加短链 id
-        $column[] = 'article_id';
-        $placeholder = array_map(function ($col) {
-            return ":$col";
-        }, $column);
+        // 唯一 id 生成
+        $data['article_id'] = DB::shortId();
 
+        $columns = array_keys($data);
+        [$col, $placeholder] = DB::getPlaceholderByKeys($columns);
         
-        $statement = "INSERT INTO $tb (title, summary, content, tag, category, bg, article_id)
-                    VALUES (:title, :summary, :content, :tag, :category, :bg, :article_id)";
+        $statement = "INSERT INTO $tb ($col) VALUES ($placeholder)";
 
         $sql = $db->prepare($statement);
 
@@ -46,10 +43,6 @@ class Article
             $sql->bindParam(":$key", $value);
         }
 
-        // 生成 short_id
-        $id = DB::shortId();
-        
-        $sql->bindParam(':article_id', $id);
         // 插入数据
         $sql->execute();
     }

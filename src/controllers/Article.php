@@ -21,14 +21,13 @@ class Article
         $data = $req['data'];
         $rules = [
             'title' => [
-                [
-                    'type' => 'string',
-                    'required' => true,
-                    'error' => '文章名称不能为空',
-                ],
+                'type' => 'string',
+                'required' => true,
+                'error' => '文章名称不能为空',
             ],
             'category' => [
                 'type' => 'enum',
+                'required' => true,
                 'enum' => ['note', 'life'],
                 'error' => '文章类别需为笔记或生活',
             ],

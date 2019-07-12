@@ -120,7 +120,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
         
         foreach ($fail as $key =>  $item) {
             $res = Util::validate($item[0], $item[1]);
-
+            
             $this->assertEquals($error, $res);
         }
     }

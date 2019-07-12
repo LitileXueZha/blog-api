@@ -48,6 +48,9 @@ class DB
         $dsn = "mysql:host=$host;port=$port;dbname=$dbname";
         $db = new PDO($dsn, DB_USER, DB_PASSWORD);
 
+        // 设置错误捕获
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
         self::$connecting = true;
         self::$db = &$db;
     }
@@ -82,5 +85,25 @@ class DB
         $id = Util::shortId($num);
 
         return $id;
+    }
+
+    /**
+     * 占位字符转化
+     * 
+     * 根据 key 数组转化成 prepare 语句里的占位字符串
+     * 
+     * @example ['name', 'age'] 转化为 ['name,age', ':name,:age']
+     * 
+     * @param Array $keys key 数组
+     * @return Array
+     */
+    public static function getPlaceholderByKeys($keys)
+    {
+        $column = implode(',', $keys);
+        $placeholder = implode(',', array_map(function ($col) {
+            return ":$col";
+        }, $keys));
+
+        return [$column, $placeholder];
     }
 }
