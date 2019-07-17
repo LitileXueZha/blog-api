@@ -106,4 +106,8 @@ class DB
 
         return [$column, $placeholder];
     }
+
+    /**
+     * 
+     */
 }

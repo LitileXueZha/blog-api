@@ -18,10 +18,18 @@ class Article
     const NAME = 'article';
 
     /**
+     * 查询返回格式
+     * 
+     * @var String
+     */
+    const FORMAT = 'article_id as id, title, summary, content, tag,
+                    status, category, bg, create_at';
+
+    /**
      * 添加一条文章
      * 
      * @param Array 文章数据
-     * @return this
+     * @return Array 插入成功后的记录
      */
     public static function add($data)
     {
@@ -40,11 +48,25 @@ class Article
 
         // 绑定参数
         foreach ($data as $key => $value) {
-            $sql->bindParam(":$key", $value);
+            $sql->bindValue(":$key", $value);
         }
 
         // 插入数据
         $sql->execute();
     }
 
+    /**
+     * 获取文章
+     * 
+     * @param Array 查询条件
+     * @return Array 文章记录
+     */
+    public static function get($params)
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+        $format = self::FORMAT;
+
+        $statement = "SELECT $format FROM $tb WHERE $str";
+    }
 }

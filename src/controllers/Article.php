@@ -45,4 +45,16 @@ class Article
 
         MMA::add($data);
     }
+
+    /**
+     * 获取一篇文章
+     * 
+     * @param Array 请求信息
+     */
+    public static function get($req)
+    {
+        $id = $req['params']['id'];
+
+        MMA::get(['article_id' => $id]);
+    }
 }
