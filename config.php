@@ -25,6 +25,8 @@ $config = [
     'DB_NAME' => 'blog',
     'DB_USER' => 'root',
     'DB_PASSWORD' => '123456',
+
+    'DIR_ROOT' => __DIR__,
 ];
 
 /**

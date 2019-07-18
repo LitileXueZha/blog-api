@@ -33,7 +33,7 @@ class Article
             ],
         ];
 
-        $msg = Util::validate($data, $rules);
+        $msg = Util::validate($data ?: [], $rules);
 
         // 规则校验失败
         if ($msg) {
