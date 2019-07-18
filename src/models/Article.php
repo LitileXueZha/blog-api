@@ -53,6 +53,10 @@ class Article
 
         // 插入数据
         $sql->execute();
+
+        $res = static::get(['article_id' => $data['article_id']]);
+
+        return $res[0];
     }
 
     /**
@@ -67,6 +71,51 @@ class Article
         $tb = self::NAME;
         $format = self::FORMAT;
 
-        $statement = "SELECT $format FROM $tb WHERE $str";
+        $columns = array_keys($params);
+        $placeholder  = implode(' AND ', array_map(function ($key) {
+            return "$key = :$key";
+        }, $columns));
+
+        $statement = "SELECT $format FROM $tb WHERE $placeholder";
+
+        $sql = $db->prepare($statement);
+
+        foreach ($columns as $key) {
+            $sql->bindValue(":$key", $params[$key]);
+        }
+
+        $sql->execute();
+
+        $res = $sql->fetchAll();
+
+        return $res;
+    }
+
+    /**
+     * 更新文章
+     * 
+     * @param String 文章 id
+     * @param Array 需要更新的数据
+     * @return Array 更新后的记录
+     */
+    public static function set($id, $data)
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+
+        $columns = array_keys($data);
+        $placeholder = implode(',', array_map(function ($key) {
+            return "$key=:$key";
+        }, $columns));
+
+        $statement = "UPDATE $tb SET $placeholder WHERE article_id=:id";
+
+        $sql = $db->prepare($statement);
+
+        foreach ($columns as $key) {
+            $sql->bindValue(":$key", $data[$key]);
+        }
+        // 防止 id 被 sql 注入
+        $sql->bindValue(':id', $id);
     }
 }

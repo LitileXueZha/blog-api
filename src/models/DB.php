@@ -50,6 +50,10 @@ class DB
 
         // 设置错误捕获
         $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        // 设置默认 fetch mode，只有列名，没有数字索引
+        $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+        // 数字转字符串的怪异现象
+        $db->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
 
         self::$connecting = true;
         self::$db = &$db;
@@ -106,8 +110,4 @@ class DB
 
         return [$column, $placeholder];
     }
-
-    /**
-     * 
-     */
 }
