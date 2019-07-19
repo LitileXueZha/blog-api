@@ -23,7 +23,7 @@ function aa($req) {
 
 $route
     // 文章相关
-    ->get('/article', 'aa') // 获取文章列表
+    ->get('/article', 'Article::list') // 获取文章列表
     ->post('/article', 'Article::add') // 创建文章
     ->get('/article/:id', 'Article::get') // 获取单个文章
     ->put('/article/:id', 'Article::update') // 更新单个文章

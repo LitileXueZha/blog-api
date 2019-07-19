@@ -100,7 +100,8 @@ final class Util
                 // type 校验。只做了基本类型
                 switch ($type) {
                     case 'string':
-                        if (is_string($data)) {
+                        // 加上空白字符校验
+                        if (is_string($data) && trim($data)) {
                             break;
                         }
 

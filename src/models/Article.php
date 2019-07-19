@@ -117,5 +117,12 @@ class Article
         }
         // 防止 id 被 sql 注入
         $sql->bindValue(':id', $id);
+
+        $sql->execute();
+
+        // 更新完后去查最新的数据，如果为空，那么此条数据不存在
+        $res = static::get(['article_id' => $id]);
+
+        return $res;
     }
 }
