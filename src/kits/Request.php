@@ -27,7 +27,8 @@ class Request
     public static function getUrl()
     {
         // 去掉 ? 之后的字符，并转化成小写
-        return strtolower(preg_replace('/(\??|\?.*)$/', '', $_SERVER['REQUEST_URI']));
+        // FIXME: 如果转化小写，对短链型 id 造成了影响
+        return preg_replace('/(\??|\?.*)$/', '', $_SERVER['REQUEST_URI']);
     }
 
     /**

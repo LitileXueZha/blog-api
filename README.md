@@ -24,3 +24,4 @@
 
 1. **PDO 驱动未安装**。编辑 `php.ini` 文件，添加 `php_pdo_mysql.dll` 扩展
 2. **MySQL 连接认证方式问题**。修改认证为 `mysql_native_password`，可以修改 `my.cnf` 或连接数据库 `ALTER USER`
+3. **`$_GET` 变量为空**。Nginx 配置的问题，在 `try_files` 加上 `?$query_string`，只有 `index.php` 的话导致空数据
