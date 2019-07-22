@@ -110,4 +110,16 @@ class DB
 
         return [$column, $placeholder];
     }
+
+    /**
+     * 查询条件转化
+     * 
+     * 根据定义的几个字段转化成
+     * 
+     * @see https://dev.mysql.com/doc/refman/8.0/en/select.html
+     */
+    public static function getQueryStr($options)
+    {
+        // TODO: xxx
+    }
 }
