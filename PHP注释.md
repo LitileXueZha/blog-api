@@ -13,7 +13,7 @@
  * @category  组织packages
  * @copyright  指明版权信息
  * @const  指明常量
- * @deprecate  指明不推荐或者是废弃的信息
+ * @deprecated  指明不推荐或者是废弃的信息
  * @example  示例
  * @exclude  指明当前的注释将不进行分析，不出现在文挡中
  * @final  指明这是一个最终的类、方法、属性，禁止派生、修改。
