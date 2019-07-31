@@ -17,7 +17,28 @@ class Article
      */
     public static function list($req)
     {
-        Log::debug($req);
+        $params = $req['data'];
+        $page = isset($params['page']) ? (int) $params['page'] : 1;
+        $size = isset($params['size']) ? (int) $params['size'] : 10;
+        // 不合法的页数设为默认 1
+        if ($page <= 0) $page = 1;
+        if ($size < 0 ) $size = 10;
+
+        $limit = $size * ($page - 1) . ", $size";
+
+        // 可供查询的字段
+        $selectableKeys = ['tag', 'status', 'category'];
+
+        // 过滤不可更新字段
+        $params = array_filter($params, function ($key) use ($selectableKeys) {
+            return in_array($key, $selectableKeys);
+        }, ARRAY_FILTER_USE_KEY);
+        
+        
+        // 筛选未删除字段
+        $params['_d'] = 0;
+        $rows = MMA::get($params, ['limit'=>$limit]);
+        Log::debug($rows);
     }
 
     /**

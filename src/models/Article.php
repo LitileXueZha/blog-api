@@ -63,20 +63,27 @@ class Article
      * 获取文章
      * 
      * @param Array 查询条件
+     * @param Array 额外参数。例如 LIMIT、GROUP BY
      * @return Array 文章记录
      */
-    public static function get($params)
+    public static function get($params, $options = [])
     {
         $db = DB::init();
         $tb = self::NAME;
-        $format = self::FORMAT;
+        $tbJoin = 'tag';
+        $join = "LEFT JOIN $tbJoin ON $tb.tag=$tbJoin.name";
+        // 查询格式
+        $format = "$tb.article_id as id, $tb.title, $tb.summary, $tb.content,
+                    $tb.tag, $tbJoin.display_name as tag_name, $tb.status, $tb.category,
+                    $tb.bg, $tb.create_at";
+        $limit = empty($options['limit']) ? '0, 10' : $options['limit'];
 
         $columns = array_keys($params);
-        $placeholder  = implode(' AND ', array_map(function ($key) {
-            return "$key = :$key";
+        $placeholder  = implode(' AND ', array_map(function ($key) use ($tb) {
+            return "$tb.$key = :$key";
         }, $columns));
 
-        $statement = "SELECT $format FROM $tb WHERE $placeholder";
+        $statement = "SELECT $format FROM $tb $join WHERE $placeholder LIMIT $limit";
 
         $sql = $db->prepare($statement);
 
