@@ -56,7 +56,7 @@ class Article
 
         $res = static::get(['article_id' => $data['article_id']]);
 
-        return $res[0];
+        return $res['items'][0];
     }
 
     /**
@@ -76,6 +76,7 @@ class Article
         $format = "$tb.article_id as id, $tb.title, $tb.summary, $tb.content,
                     $tb.tag, $tbJoin.display_name as tag_name, $tb.status, $tb.category,
                     $tb.bg, $tb.create_at";
+        // 分页
         $limit = empty($options['limit']) ? '0, 10' : $options['limit'];
 
         $columns = array_keys($params);
@@ -83,7 +84,7 @@ class Article
             return "$tb.$key = :$key";
         }, $columns));
 
-        $statement = "SELECT $format FROM $tb $join WHERE $placeholder LIMIT $limit";
+        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb $join WHERE $placeholder LIMIT $limit";
 
         $sql = $db->prepare($statement);
 
@@ -94,8 +95,13 @@ class Article
         $sql->execute();
 
         $res = $sql->fetchAll();
+        $sqlCount = $db->query("SELECT FOUND_ROWS()");
+        $count = $sqlCount->fetch();
 
-        return $res;
+        return [
+            'total' => $count['FOUND_ROWS()'],
+            'items' => $res,
+        ];
     }
 
     /**
@@ -130,6 +136,6 @@ class Article
         // 更新完后去查最新的数据，如果为空，那么此条数据不存在
         $res = static::get(['article_id' => $id]);
 
-        return $res;
+        return $res['items'];
     }
 }

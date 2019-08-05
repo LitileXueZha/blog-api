@@ -37,8 +37,10 @@ class Article
         
         // 筛选未删除字段
         $params['_d'] = 0;
-        $rows = MMA::get($params, ['limit'=>$limit]);
-        Log::debug($rows);
+        $rows = MMA::get($params, ['limit' => $limit]);
+        $res = new Response(HttpCode::OK, $rows);
+
+        $res->end();
     }
 
     /**
@@ -87,7 +89,8 @@ class Article
         $id = $req['params']['id'];
         // 筛选未逻辑删除字段
         $params = ['article_id' => $id, '_d' => 0];
-        $rows = MMA::get($params);
+        $res = MMA::get($params);
+        $rows = $res['items'];
 
         // 不存在此条记录，返回 404
         if (count($rows) === 0) {

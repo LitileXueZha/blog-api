@@ -141,9 +141,9 @@ class Response
             header($this->headers[$i]);
         }
 
-        // JSON_FORCE_OBJECT 将空数组转为 {}
+        // JSON_FORCE_OBJECT 将数组转为 {}
         // JSON_UNESCAPED_UNICODE 保持中文数据，不转 \uxxxx 类型
-        echo json_encode($response, JSON_FORCE_OBJECT | JSON_UNESCAPED_UNICODE);
+        echo json_encode($response, JSON_UNESCAPED_UNICODE);
 
         // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）
         exit();
