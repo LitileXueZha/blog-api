@@ -200,4 +200,26 @@ final class Util
 
         return $id;
     }
+
+    /**
+     * 筛选数据中的字段名
+     * 
+     * 没有直接用 array_filter，因为直接取 key 的方式更高效
+     * 
+     * @param Array 数据
+     * @param Array 字段名数组
+     * @return Array 筛选后的数据
+     */
+    public static function filter($source, $keys)
+    {
+        $data = [];
+
+        foreach ($keys as $key) {
+            if (isset($source[$key])) {
+                $data[$key] = $source[$key];
+            }
+        }
+
+        return $data;
+    }
 }

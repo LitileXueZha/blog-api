@@ -28,12 +28,7 @@ class Article
 
         // 可供查询的字段
         $selectableKeys = ['tag', 'status', 'category'];
-
-        // 过滤不可更新字段
-        $params = array_filter($params, function ($key) use ($selectableKeys) {
-            return in_array($key, $selectableKeys);
-        }, ARRAY_FILTER_USE_KEY);
-        
+        $params = Util::filter($params ?: [], $selectableKeys);        
         
         // 筛选未删除字段
         $params['_d'] = 0;
@@ -72,6 +67,10 @@ class Article
             self::bad($msg);
             return;
         }
+
+        // 可供添加的字段
+        $keys = ['title', 'summary', 'content', 'tag', 'category', 'bg'];
+        $data = Util::filter($data, $keys);
 
         $record = MMA::add($data);
         $res = new Response(HttpCode::OK, $record);
@@ -155,12 +154,8 @@ class Article
 
         // 可供更新的字段
         $updatableKeys = ['title', 'summary', 'content', 'tag', 'status', 'category', 'bg'];
-
         // 过滤不可更新字段
-        $data = array_filter(/** 简写的三目运算符 */$data ?: [], function ($key) use ($updatableKeys) {
-            return in_array($key, $updatableKeys);
-        }, ARRAY_FILTER_USE_KEY);
-        
+        $data = Util::filter(/** 简写的三目运算符 */$data ?: [], $updatableKeys);        
 
         // 无数据，返回 400
         if (empty($data)) {

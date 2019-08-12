@@ -141,4 +141,19 @@ class UtilTest extends \PHPUnit\Framework\TestCase
             $this->assertEquals($id, Util::shortId($num));
         }
     }
+
+    /**
+     * @testdox 是否数据能够正确筛选
+     */
+    public function testFilter()
+    {
+        $data = [
+            'key1' => 1,
+            'key2' => 2,
+            'key3' => 3,
+        ];
+
+        $this->assertEquals(['key2' => 2], Util::filter($data, ['key2']));
+        $this->assertEquals([], Util::filter($data, ['key4']));
+    }
 }
