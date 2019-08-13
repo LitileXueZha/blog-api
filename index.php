@@ -23,11 +23,11 @@ function aa($req) {
 
 $route
     // 文章相关
-    ->get('/article', 'Article::list') // 获取文章列表
-    ->post('/article', 'Article::add') // 创建文章
-    ->get('/article/:id', 'Article::get') // 获取单个文章
-    ->put('/article/:id', 'Article::update') // 更新单个文章
-    ->delete('/article/:id', 'Article::delete') // 删除单个文章
+    ->get('/articles', 'Article::list') // 获取文章列表
+    ->post('/articles', 'Article::add') // 创建文章
+    ->get('/articles/:id', 'Article::get') // 获取单个文章
+    ->put('/articles/:id', 'Article::update') // 更新单个文章
+    ->delete('/articles/:id', 'Article::delete') // 删除单个文章
 
     // 其它
     ->get('/no', 'aa')
