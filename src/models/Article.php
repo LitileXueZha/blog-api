@@ -64,7 +64,7 @@ class Article
      * 
      * @param Array 查询条件
      * @param Array 额外参数。例如 LIMIT、GROUP BY
-     * @return Array 文章记录
+     * @return Array 文章数据。格式为 [ count, items ]
      */
     public static function get($params, $options = [])
     {
@@ -137,5 +137,24 @@ class Article
         $res = static::get(['article_id' => $id]);
 
         return $res['items'];
+    }
+
+    /**
+     * 删除文章
+     * 
+     * @param String 文章 id
+     * @return Number 受影响的行数。可通过此来判断是否存在此文章
+     */
+    public static function delete($id)
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+        // 转义，防止 sql 注入
+        $id = $db->quote($id);
+        $statement = "UPDATE $tb SET _d=1 WHERE article_id=$id";
+
+        $count = $db->exec($statement);
+
+        return $count;
     }
 }

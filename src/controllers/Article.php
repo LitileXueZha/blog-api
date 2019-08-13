@@ -180,6 +180,28 @@ class Article
     }
 
     /**
+     * 删除一篇文章
+     * 
+     * @param Array 请求信息
+     */
+    public static function delete($req)
+    {
+        $id = $req['params']['id'];
+        $count = MMA::delete($id);
+
+        // 已被删除或不存在，返回 404
+        if ($count === 0) {
+            self::notFound();
+            return;
+        }
+
+        // 返回一个 NULL，代表着这个数据为空，被删掉了
+        $res = new Response(HttpCode::OK, NULL);
+
+        $res->end();
+    }
+
+    /**
      * 文章不存在
      * 
      * 统一返回 404 逻辑，复用代码
