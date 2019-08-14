@@ -32,7 +32,7 @@ $route
     // 标签相关
     ->get('/tags', 'Tag::list') // 列表
     ->post('/tags', 'Tag::add') // 创建标签
-    ->get('/tags/:id', 'Tag::get') // 获取单个标签
+    // ->get('/tags/:id', 'Tag::get') // 获取单个标签
     ->put('/tags/:id', 'Tag::update') // 更新单个标签
     ->delete('/tags/:id', 'Tag::delete') // 删除标签
 
