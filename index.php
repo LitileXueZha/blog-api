@@ -29,6 +29,13 @@ $route
     ->put('/articles/:id', 'Article::update') // 更新单个文章
     ->delete('/articles/:id', 'Article::delete') // 删除单个文章
 
+    // 标签相关
+    ->get('/tags', 'Tag::list') // 列表
+    ->post('/tags', 'Tag::add') // 创建标签
+    ->get('/tags/:id', 'Tag::get') // 获取单个标签
+    ->put('/tags/:id', 'Tag::update') // 更新单个标签
+    ->delete('/tags/:id', 'Tag::delete') // 删除标签
+
     // 其它
     ->get('/no', 'aa')
     ->get('/user', 'aa')
