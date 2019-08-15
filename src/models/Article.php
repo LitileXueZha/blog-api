@@ -64,7 +64,7 @@ class Article
      * 
      * @param Array 查询条件
      * @param Array 额外参数。例如 LIMIT、GROUP BY
-     * @return Array 文章数据。格式为 [ count, items ]
+     * @return Array 文章数据。格式为 [ total, items ]
      */
     public static function get($params, $options = [])
     {
@@ -134,7 +134,7 @@ class Article
         $sql->execute();
 
         // 更新完后去查最新的数据，如果为空，那么此条数据不存在
-        $res = static::get(['article_id' => $id]);
+        $res = static::get(['article_id' => $id, '_d' => 0]);
 
         return $res['items'];
     }

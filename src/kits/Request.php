@@ -73,6 +73,8 @@ class Request
     /**
      * 返回本次请求数据
      * 
+     * `$_GET` 与 `$_POST` 一定是数组，保证其它请求方法返回的也是数组
+     * 
      * @return Array
      */
     public static function getData()
@@ -90,13 +92,14 @@ class Request
             
             // 如果 $_POST 拿不到，得要从 php://input 中拿
             if (!$data) {
-                $data = json_decode(file_get_contents('php://input'), true);
+                $data = json_decode(file_get_contents('php://input'), true) 
+                        ?:/** 简写的三目运算符 */ [];
             }
 
             return $data;
         }
         
         // 其它请求 PUT、DELETE 从 php://input 中获取，必须保证不是 multipart/form-data 形式
-        return json_decode(file_get_contents('php://input'), true);
+        return json_decode(file_get_contents('php://input'), true) ?: [];
     }
 }

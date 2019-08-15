@@ -8,7 +8,7 @@ require_once __DIR__.'/../models/Article.php';
 
 use TC\Model\Article as MMA;
 
-class Article
+class Article extends BaseController
 {
     /**
      * 获取一系列的文章
@@ -28,7 +28,7 @@ class Article
 
         // 可供查询的字段
         $selectableKeys = ['tag', 'status', 'category'];
-        $params = Util::filter($params ?: [], $selectableKeys);        
+        $params = Util::filter($params, $selectableKeys);        
         
         // 筛选未删除字段
         $params['_d'] = 0;
@@ -43,7 +43,7 @@ class Article
      * 
      * @param Array 请求信息
      */
-    public static function add($req)
+    public static function create($req)
     {
         $data = $req['data'];
         $rules = [
@@ -60,7 +60,7 @@ class Article
             ],
         ];
 
-        $msg = Util::validate($data ?: [], $rules);
+        $msg = Util::validate($data, $rules);
 
         // 规则校验失败
         if ($msg) {
@@ -83,7 +83,7 @@ class Article
      * 
      * @param Array 请求信息
      */
-    public static function get($req)
+    public static function read($req)
     {
         $id = $req['params']['id'];
         // 筛选未逻辑删除字段
@@ -116,14 +116,6 @@ class Article
                 'type' => 'string',
                 'error' => '文章名称不正确',
             ],
-            'summary' => [
-                'type' => 'string',
-                'error' => '文章简介不正确',
-            ],
-            'content' => [
-                'type' => 'string',
-                'error' => '文章内容不正确',
-            ],
             'status' => [
                 'type' => 'number',
                 'error' => '文章状态需为数字',
@@ -138,10 +130,6 @@ class Article
                 'enum' => ['note', 'life'],
                 'error' => '文章类别需为笔记或生活',
             ],
-            'bg' => [
-                'type' => 'string',
-                'error' => '文章背景图不正确',
-            ],
         ];
 
         $msg = Util::validate($data, $rules);
@@ -155,11 +143,11 @@ class Article
         // 可供更新的字段
         $updatableKeys = ['title', 'summary', 'content', 'tag', 'status', 'category', 'bg'];
         // 过滤不可更新字段
-        $data = Util::filter(/** 简写的三目运算符 */$data ?: [], $updatableKeys);        
+        $data = Util::filter($data, $updatableKeys);        
 
         // 无数据，返回 400
         if (empty($data)) {
-            self::bad('没有要更新的数据');
+            self::bad('没有可更新的数据');
             return;
         }
 
@@ -198,34 +186,6 @@ class Article
         // 返回一个 NULL，代表着这个数据为空，被删掉了
         $res = new Response(HttpCode::OK, NULL);
 
-        $res->end();
-    }
-
-    /**
-     * 文章不存在
-     * 
-     * 统一返回 404 逻辑，复用代码
-     */
-    private static function notFound()
-    {
-        $res = new Response(HttpCode::NOT_FOUND);
-
-        $res->setErrorMsg('请求的文章不存在');
-        $res->end();
-    }
-
-    /**
-     * 文章数据有误
-     * 
-     * 统一返回 400 逻辑
-     * 
-     * @param String 错误信息
-     */
-    private static function bad($msg)
-    {
-        $res = new Response(HttpCode::BAD_REQUEST);
-
-        $res->setErrorMsg($msg);
         $res->end();
     }
 }
