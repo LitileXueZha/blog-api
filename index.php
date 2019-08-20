@@ -12,6 +12,7 @@ require_once __DIR__.'/config.php';
 require_once __DIR__.'/src/app.php';
 require_once __DIR__.'/src/controllers/Article.php';
 require_once __DIR__.'/src/controllers/Tag.php';
+require_once __DIR__.'/src/controllers/Msg.php';
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
@@ -36,6 +37,12 @@ $route
     ->get('/tags/:id', 'Tag::read') // 获取单个标签
     ->put('/tags/:id', 'Tag::update') // 更新单个标签
     ->delete('/tags/:id', 'Tag::delete') // 删除标签
+
+    // 留言相关
+    ->get('/msg', 'Msg::list') // 列表
+    ->post('/msg', 'Msg::create') // 创建留言
+    ->put('/msg/:id', 'Msg::update') // 更新单条留言
+    ->delete('/msg/:id', 'Msg::delete') // 删除留言
 
     // 其它
     ->get('/no', 'aa')
