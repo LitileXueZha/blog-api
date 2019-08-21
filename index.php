@@ -41,6 +41,7 @@ $route
     // 留言相关
     ->get('/msg', 'Msg::list') // 列表
     ->post('/msg', 'Msg::create') // 创建留言
+    ->get('/msg/:id', 'Msg::read') // 获取单条留言
     ->put('/msg/:id', 'Msg::update') // 更新单条留言
     ->delete('/msg/:id', 'Msg::delete') // 删除留言
 

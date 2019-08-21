@@ -18,13 +18,7 @@ class Article extends BaseController
     public static function list($req)
     {
         $params = $req['data'];
-        $page = isset($params['page']) ? (int) $params['page'] : 1;
-        $size = isset($params['size']) ? (int) $params['size'] : 10;
-        // 不合法的页数设为默认 1
-        if ($page <= 0) $page = 1;
-        if ($size < 0 ) $size = 10;
-
-        $limit = $size * ($page - 1) . ", $size";
+        $limit = self::getLimitByQuery($params);
 
         // 可供查询的字段
         $selectableKeys = ['tag', 'status', 'category'];

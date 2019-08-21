@@ -27,7 +27,7 @@ class Response
 
     // 返回 body 数据
     private $code;
-    private $error = '请求失败';
+    private $error = '等等，服务器出bug了!';
     private $data;
 
 
