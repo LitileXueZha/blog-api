@@ -111,13 +111,9 @@ class Article extends BaseController
                 'error' => '文章名称不正确',
             ],
             'status' => [
-                'type' => 'number',
-                'error' => '文章状态需为数字',
-                'validator' => function ($data) {
-                    if (!in_array($data, [0, 1, 2, 3])) {
-                        return '文章状态不正确';
-                    }
-                },
+                'type' => 'enum',
+                'enum' => [0, 1, 2, 3],
+                'error' => '文章状态不正确',
             ],
             'category' => [
                 'type' => 'enum',

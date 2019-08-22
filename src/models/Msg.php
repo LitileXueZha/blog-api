@@ -100,4 +100,63 @@ class Msg
             'items' => $res,
         ];
     }
+
+    /**
+     * 更新留言
+     * 
+     * @param String 留言 id
+     * @param Array 要更新的留言数据
+     * @return Array 更新后的记录。为空则表示数据不存在
+     */
+    public static function set($id, $data)
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+
+        $columns = array_keys($data);
+        // 占位符
+        $placeholder = implode(',', array_map(function ($key) {
+            return "$key = :$key";
+        }, $columns));
+
+        $statement = "UPDATE $tb SET $placeholder WHERE msg_id=:id";
+
+        $sql = $db->prepare($statement);
+
+        // 绑定数据
+        foreach ($data as $key => $value) {
+            $sql->bindValue(":$key", $value);
+        }
+        // 防 sql 注入
+        $sql->bindValue(':id', $id);
+
+        $sql->execute();
+
+        // 更新后查询，如果为空则数据不存在
+        // NOTE: 如果是被逻辑删除的数据，还是会被更新。应该在逻辑层做控制
+        $res = self::get(['msg_id' => $id, '_d' => 0]);
+
+        return $res['items'];
+    }
+
+    /**
+     * 删除留言
+     * 
+     * @param String 留言 id
+     * @return Number 受影响的行数。如果为 0 则表示数据不存在
+     */
+    public static function delete($id)
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+        // 防 sql 注入，转义之
+        $id = $db->quote($id);
+
+        $statement = "UPDATE $tb SET _d=1 WHERE msg_id=$id";
+
+        // 执行获取受影响行数
+        $count = $db->exec($statement);
+
+        return $count;
+    }
 }

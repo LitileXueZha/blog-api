@@ -115,6 +115,27 @@ class Msg extends BaseController
     {
         $id = $req['params']['id'];
         $data = $req['data'];
+        $rules = [
+            'avatar' => [
+                // 此类型表示不确定，例如 null 代表删除，也可更新
+                'type' => 'mixed',
+                'validator' => function ($data) {
+                    // 如果为对象，会导致 sql 预处理语句绑定值时失败
+                    // FIXME: 还有其它地方，会导致攻击漏洞！
+                    if (is_array($data)) {
+                        return '头像不正确';
+                    }
+                },
+            ],
+        ];
+
+        $msg = Util::validate($data, $rules);
+
+        // 规则校验失败
+        if ($msg) {
+            self::bad($msg);
+            return;
+        }
 
         // 可更新的字段
         $keys = ['avatar'];
@@ -122,7 +143,44 @@ class Msg extends BaseController
         $keysAdmin = ['avatar', 'name', 'content'];
         $data = Util::filter($data, $keys);
 
-        Log::debug($id);
+        // 无更新数据，返回 400
+        if (count($data) === 0) {
+            self::bad('没有可更新的数据');
+            return;
+        }
+
+        $rows = MM::set($id, $data);
+
+        // 无此留言
+        if (count($rows) === 0) {
+            self::notFound();
+            return;
+        }
+
+        $res = new Response(HttpCode::OK, $rows[0]);
+
+        $res->end();
+    }
+
+    /**
+     * 删除留言
+     * 
+     * @param Array 请求信息
+     */
+    public static function delete($req)
+    {
+        $id = $req['params']['id'];
+        $count = MM::delete($id);
+
+        if ($count === 0) {
+            self::notFound();
+            return;
+        }
+
+        // 返回数据为 null，代表数据被删除了
+        $res = new Response(HttpCode::OK, NULL);
+
+        $res->end();
     }
 }
 

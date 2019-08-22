@@ -63,6 +63,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
             'github' => 'https://github.com/litilexuezha',
             'phone' => '18255447846',
             'whoami' => 'dafas',
+            'mixed' => NULL,
         ];
         $rules = [
             'name' => ['type' => 'string'],
@@ -79,6 +80,7 @@ class UtilTest extends \PHPUnit\Framework\TestCase
                     return NULL;
                 },
             ],
+            'mixed' => ['type' => 'mixed'],
         ];
         $msg = Util::validate($data, $rules);
 

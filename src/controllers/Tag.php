@@ -114,13 +114,9 @@ class Tag extends BaseController
                 'error' => '标签名不正确',
             ],
             'status' => [
-                'type' => 'number',
+                'type' => 'enum',
+                'enum' => [1, 2],
                 'error' => '标签状态不正确',
-                'validator' => function ($status) {
-                    if (!in_array($status, [1, 2])) {
-                        return '标签状态不正确';
-                    }
-                },
             ],
         ];
 
@@ -132,7 +128,8 @@ class Tag extends BaseController
         }
 
         $keys = ['name', 'status'];
-        $updateData = [];
+        // 筛选未逻辑删除
+        $updateData = ['_d' => 0];
 
         foreach ($data as $key => $value) {
             if (in_array($key, $keys)) {

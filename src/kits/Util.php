@@ -142,6 +142,8 @@ final class Util
                         }
 
                         return $error;
+                    default:
+                        break;
                 }
 
                 // pattern 正则校验
@@ -215,7 +217,7 @@ final class Util
         $data = [];
 
         foreach ($keys as $key) {
-            if (isset($source[$key])) {
+            if (array_key_exists($key, $source)) {
                 $data[$key] = $source[$key];
             }
         }
