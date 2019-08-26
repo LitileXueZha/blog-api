@@ -111,7 +111,7 @@ class Tag
             return "$key = :$key";
         }, $columns));
 
-        $statement = "UPDATE $tb SET $placeholder WHERE `name`=:id";
+        $statement = "UPDATE $tb SET $placeholder WHERE `name`=:id AND _d=0";
 
         $sql = $db->prepare($statement);
 

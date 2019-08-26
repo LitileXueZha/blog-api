@@ -121,7 +121,8 @@ class Article
             return "$key=:$key";
         }, $columns));
 
-        $statement = "UPDATE $tb SET $placeholder WHERE article_id=:id";
+        // 筛选未逻辑删除
+        $statement = "UPDATE $tb SET $placeholder WHERE article_id=:id AND _d=0";
 
         $sql = $db->prepare($statement);
 

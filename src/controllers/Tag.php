@@ -128,8 +128,7 @@ class Tag extends BaseController
         }
 
         $keys = ['name', 'status'];
-        // 筛选未逻辑删除
-        $updateData = ['_d' => 0];
+        $updateData = [];
 
         foreach ($data as $key => $value) {
             if (in_array($key, $keys)) {

@@ -141,9 +141,6 @@ class Article extends BaseController
             return;
         }
 
-        // 筛选未逻辑删除字段
-        $data['_d'] = 0;
-
         $rows = MMA::set($id, $data);
 
         // 不存在此条记录，返回 404
