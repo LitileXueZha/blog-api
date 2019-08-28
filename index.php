@@ -14,6 +14,7 @@ require_once __DIR__.'/src/controllers/Article.php';
 require_once __DIR__.'/src/controllers/Tag.php';
 require_once __DIR__.'/src/controllers/Msg.php';
 require_once __DIR__.'/src/controllers/Comment.php';
+require_once __DIR__.'/src/controllers/Search.php';
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
@@ -54,12 +55,11 @@ $route
     ->delete('/comments/:id', 'Comment::delete') // 删除单条评论
 
     // 其它
-    ->get('/no', 'aa')
+    ->get('/search', 'Search::list') // 搜索
     ->get('/user', 'aa')
     ->delete('/user', 'aa')
     ->get('/user/:id', 'aa')
-    ->get('/example/**', 'aa')
-    ->get('/', 'aa');
+    ->get('/example/**', 'aa');
 
 App::use(new Auth);
 App::use(new RouteMiddleware($route));
