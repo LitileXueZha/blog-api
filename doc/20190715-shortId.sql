@@ -12,3 +12,10 @@ AUTO_INCREMENT=4000
 DEFAULT CHARSET=utf8mb4
 COLLATE=utf8mb4_general_ci
 COMMENT='shortId 计数表';
+
+-- 全文检索，使用 FULLTEXT 索引
+-- 目前只检索文章表
+CREATE FULLTEXT INDEX `ftx_article`
+ON `article` (`title`, `summary`, `content`)
+-- 使用内置的分词器，ngram 支持中日韩
+WITH PARSER ngram;

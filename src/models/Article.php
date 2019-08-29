@@ -158,4 +158,36 @@ class Article
 
         return $count;
     }
+
+    /**
+     * 全文本搜索
+     * 
+     * @param String 查询字符串
+     * @param Array 额外的参数。例如 LIMIT
+     */
+    public static function fulltextSearch($q, $options = [])
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+        // 查询格式。只需要查询文本搜索的几个字段，并添加一列 type 固定值为 article
+        $format = "article_id as id, title, summary, content, 'article' as type, create_at";
+        // 分页
+        $limit = empty($options['limit']) ? '0, 10' : $options['limit'];
+        // 防 sql 注入，转义之
+        $q = $db->quote($q);
+
+        // 默认 IN NATURAL LANGUAGE MODE
+        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE _d=0 AND
+                        match(title, summary, content) against($q) LIMIT $limit";
+
+        $sql = $db->query($statement);
+        $sqlCount = $db->query("SELECT FOUND_ROWS()");
+        $res = $sql->fetchAll();
+        $resCount = $sqlCount->fetch();
+
+        return [
+            'total' => $resCount['FOUND_ROWS()'],
+            'items' => $res,
+        ];
+    }
 }
