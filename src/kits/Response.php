@@ -143,7 +143,14 @@ class Response
 
         // JSON_FORCE_OBJECT 将数组转为 {}
         // JSON_UNESCAPED_UNICODE 保持中文数据，不转 \uxxxx 类型
-        echo json_encode($response, JSON_UNESCAPED_UNICODE);
+        $json = json_encode($response, JSON_UNESCAPED_UNICODE);
+        
+        // json 转字符串错误，抛出异常
+        if ($json === false) {
+            throw new Exception('json_last_error: '. json_last_error());
+        }
+        
+        echo $json;
 
         // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）
         exit();
