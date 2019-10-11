@@ -122,4 +122,21 @@ class DB
     {
         // TODO: xxx
     }
+
+    /**
+     * 读取配置，如果没有返回默认
+     * 
+     * @param Array $options 配置项
+     * @return Array 配置项
+     */
+    public static function getOptsOrDefault($options)
+    {
+        // 目前支持的配置项
+        $arr = [
+            'limit' => '0, 10', // 默认分页 10 条
+            'orderBy' => 'create_at DESC', // 默认创建时间倒序
+        ];
+
+        return array_merge($arr, $options);
+    }
 }

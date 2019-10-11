@@ -27,6 +27,12 @@ class Article extends BaseController
         // 筛选未删除字段
         $params['_d'] = 0;
         $rows = MMA::get($params, ['limit' => $limit]);
+
+        // 去除 `content` 字段，列表不返回文章具体内容
+        foreach ($rows['items'] as &$item) {
+            unset($item['content']);
+        }
+
         $res = new Response(HttpCode::OK, $rows);
 
         $res->end();

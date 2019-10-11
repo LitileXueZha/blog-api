@@ -68,13 +68,14 @@ class Tag
         $db = DB::init();
         $tb = self::NAME;
         $format = self::FORMAT;
+        $orderBy = DB::getOptsOrDefault($options)['orderBy'];
 
         $columns = array_keys($params);
         $placeholder = implode(' AND ', array_map(function ($key) {
             return "$key = :$key";
         }, $columns));
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder";
+        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder ORDER BY $orderBy";
 
         $sql = $db->prepare($statement);
 
