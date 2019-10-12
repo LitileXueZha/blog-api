@@ -71,6 +71,11 @@ class Tag extends BaseController
                 'required' => true,
                 'error' => '标签名不能为空'
             ],
+            'status' => [
+                'type' => 'enum',
+                'enum' => [1, 2],
+                'error' => '标签状态不正确',
+            ],
         ];
 
         $msg = Util::validate($data, $rules);
@@ -84,6 +89,7 @@ class Tag extends BaseController
         $data = [
             'name' => $data['id'],
             'display_name' => $data['name'],
+            'status' => $data['status'],
         ];
 
         $rows = MMT::get(['name' => $data['name'], '_d' => 0]);

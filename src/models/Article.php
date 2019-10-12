@@ -77,14 +77,18 @@ class Article
                     $tb.tag, $tbJoin.display_name as tag_name, $tb.status, $tb.category,
                     $tb.bg, $tb.create_at";
         // 分页
-        $limit = empty($options['limit']) ? '0, 10' : $options['limit'];
+        [
+            'limit' => $limit,
+            'orderBy' => $orderBy,
+        ] = DB::getOptsOrDefault($options);
 
         $columns = array_keys($params);
         $placeholder  = implode(' AND ', array_map(function ($key) use ($tb) {
             return "$tb.$key = :$key";
         }, $columns));
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb $join WHERE $placeholder LIMIT $limit";
+        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb $join
+                    WHERE $placeholder ORDER BY $tb.$orderBy LIMIT $limit";
 
         $sql = $db->prepare($statement);
 

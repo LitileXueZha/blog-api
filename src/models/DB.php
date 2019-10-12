@@ -132,11 +132,11 @@ class DB
     public static function getOptsOrDefault($options)
     {
         // 目前支持的配置项
-        $arr = [
+        $defaultOpts = [
             'limit' => '0, 10', // 默认分页 10 条
             'orderBy' => 'create_at DESC', // 默认创建时间倒序
         ];
 
-        return array_merge($arr, $options);
+        return array_merge($defaultOpts, $options);
     }
 }
