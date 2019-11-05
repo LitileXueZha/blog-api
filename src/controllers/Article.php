@@ -58,6 +58,11 @@ class Article extends BaseController
                 'enum' => ['note', 'life'],
                 'error' => '文章类别需为笔记或生活',
             ],
+            'status' => [
+                'type' => 'enum',
+                'enum' => [1],
+                'error' => '文章状态需为上线',
+            ],
         ];
 
         $msg = Util::validate($data, $rules);
@@ -69,7 +74,7 @@ class Article extends BaseController
         }
 
         // 可供添加的字段
-        $keys = ['title', 'summary', 'content', 'tag', 'category', 'bg'];
+        $keys = ['title', 'summary', 'content', 'status', 'tag', 'category', 'bg'];
         $data = Util::filter($data, $keys);
 
         $record = MMA::add($data);

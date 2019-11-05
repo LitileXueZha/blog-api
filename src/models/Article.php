@@ -83,7 +83,23 @@ class Article
         ] = DB::getOptsOrDefault($options);
 
         $columns = array_keys($params);
-        $placeholder  = implode(' AND ', array_map(function ($key) use ($tb) {
+        $placeholder  = implode(' AND ', array_map(function ($key) use ($tb, $params) {
+            $param = $params[$key];
+
+            if (is_array($param)) {
+                // 复杂的 sql 数组型参数查询
+                // 吐血的 PDO 不支持直接 IN (1,2,3) 形式，只能一个个绑定
+                // @link https://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
+                $str = [];
+
+                foreach ($param as $i => $value) {
+                    $str[] = ":$key$i";
+                }
+                $str = implode(',', $str);
+
+                return "$tb.$key IN ($str)";
+            }
+
             return "$tb.$key = :$key";
         }, $columns));
 
@@ -93,7 +109,18 @@ class Article
         $sql = $db->prepare($statement);
 
         foreach ($columns as $key) {
-            $sql->bindValue(":$key", $params[$key]);
+            $param = $params[$key];
+
+            if (is_array($param)) {
+                // 复杂的 sql 数组型参数查询
+                foreach ($param as $i => $val) {
+                    $sql->bindValue(":$key$i", $val);
+                }
+                
+                continue;
+            }
+
+            $sql->bindValue(":$key", $param);
         }
 
         $sql->execute();
