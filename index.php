@@ -32,6 +32,7 @@ $route
     ->get('/articles/:id', 'Article::read') // 获取单篇文章
     ->put('/articles/:id', 'Article::update') // 更新单篇文章
     ->delete('/articles/:id', 'Article::delete') // 删除单篇文章
+    ->get('/articles/trash', 'Article::getTrashList') // 文章垃圾箱
 
     // 标签模块
     ->get('/tags', 'Tag::list') // 列表

@@ -221,4 +221,52 @@ class Article
             'items' => $res,
         ];
     }
+
+    /**
+     * 获取文章垃圾箱
+     * 
+     * @param Array 查询条件
+     * @param Array 额外参数。例如 LIMIT、GROUP BY
+     * @return Array 文章数据。格式为 [ total, items ]
+     */
+    public static function trash($params, $options = [])
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+        $tbJoin = 'tag';
+        $join = "LEFT JOIN $tbJoin ON $tb.tag=$tbJoin.name";
+        // 查询格式
+        $format = "$tb.article_id as id, $tb.title, $tb.summary, $tb.content,
+                    $tbJoin.display_name as tag, $tb.category, $tb.modify_at";
+        // 分页
+        [
+            'limit' => $limit,
+            'orderBy' => $orderBy,
+        ] = DB::getOptsOrDefault($options);
+
+        $columns = array_keys($params);
+        $placeholder  = implode(' AND ', array_map(function ($key) use ($tb, $params) {
+            return "$tb.$key = :$key";
+        }, $columns));
+
+        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb $join
+                    WHERE $placeholder ORDER BY $tb.$orderBy LIMIT $limit";
+
+        $sql = $db->prepare($statement);
+
+        foreach ($columns as $key) {
+            $sql->bindValue(":$key", $params[$key]);
+        }
+
+        $sql->execute();
+
+        $res = $sql->fetchAll();
+        $sqlCount = $db->query("SELECT FOUND_ROWS()");
+        $count = $sqlCount->fetch();
+
+        return [
+            'total' => $count['FOUND_ROWS()'],
+            'items' => $res,
+        ];
+    }
 }

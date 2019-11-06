@@ -186,4 +186,38 @@ class Article extends BaseController
 
         $res->end();
     }
+
+    /**
+     * 获取文章垃圾箱列表
+     * 
+     * @param Array 请求信息
+     */
+    public static function getTrashList($req)
+    {
+        $params = $req['data'];
+        $limit = self::getLimitByQuery($params);
+        
+        // 不支持其它字段筛选
+        $params = [
+            'status' => 3,
+            // 筛选未删除字段
+            '_d' => 0,
+        ];
+        $rows = MMA::trash($params, [
+            'limit' => $limit,
+            'orderBy' => 'modify_at DESC', // 根据移动到垃圾箱时间倒序
+        ]);
+
+        foreach ($rows['items'] as &$item) {
+            // 文章摘要为空时，返回部分文章内容
+            if (empty($item['summary']) && !empty($item['content'])) {
+                $item['summary'] = mb_substr($item['content'], 0, 80);
+            }
+            unset($item['content']);
+        }
+
+        $res = new Response(HttpCode::OK, $rows);
+
+        $res->end();
+    }
 }
