@@ -44,7 +44,7 @@ class Search extends BaseController
         $keyword = self::participle($q);
 
         foreach ($rows['items'] as $row) {
-            $summary = $row['summary'] . $row['content'];
+            $summary = $row['summary'] . $row['text_content'];
             // 用分词精确匹配
             $result = self::keytext($keyword, $summary);
 
@@ -59,7 +59,7 @@ class Search extends BaseController
             $row['url'] = '/articles/detail?id='. $row['id'];
             // 数据转化
             $row['summary'] = $result;
-            unset($row['content']);
+            unset($row['text_content']);
 
             $searchRows[] = $row;
         }

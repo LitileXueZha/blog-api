@@ -21,6 +21,7 @@ CREATE TABLE `article` (
     `title` varchar(20) NOT NULL COMMENT '标题',
     `summary` varchar(200) DEFAULT NULL COMMENT '简介',
     `content` text DEFAULT NULL COMMENT '文章内容',
+    `text_content` text DEFAULT NULL COMMENT '纯文本内容，不是 md 格式',
     `tag` varchar(20) DEFAULT 'none' COMMENT '所属标签',
     `status` tinyint(1) DEFAULT 0 COMMENT '状态：0-草稿、1-上线、2-下线、3-垃圾箱',
     `category` enum('note', 'life') NOT NULL COMMENT '所属分类：笔记、生活',
@@ -40,7 +41,7 @@ CREATE TABLE `article` (
     KEY `idx_article` (`article_id`, `_d`),
     -- 全文检索，使用 FULLTEXT 索引。目前只检索文章表
     -- 使用内置的分词器，ngram 支持中日韩
-    FULLTEXT KEY `ftx_article` (`title`, `summary`, `content`) WITH PARSER ngram
+    FULLTEXT KEY `ftx_article` (`title`, `summary`, `text_content`) WITH PARSER ngram
 )
 ENGINE=InnoDB
 DEFAULT CHARSET=utf8mb4

@@ -74,7 +74,7 @@ class Article extends BaseController
         }
 
         // 可供添加的字段
-        $keys = ['title', 'summary', 'content', 'status', 'tag', 'category', 'bg'];
+        $keys = ['title', 'summary', 'content', 'text_content', 'status', 'tag', 'category', 'bg'];
         $data = Util::filter($data, $keys);
 
         $record = MMA::add($data);
@@ -142,7 +142,7 @@ class Article extends BaseController
         }
 
         // 可供更新的字段
-        $updatableKeys = ['title', 'summary', 'content', 'tag', 'status', 'category', 'bg'];
+        $updatableKeys = ['title', 'summary', 'content', 'text_content', 'tag', 'status', 'category', 'bg'];
         // 过滤不可更新字段
         $data = Util::filter($data, $updatableKeys);        
 
@@ -211,7 +211,7 @@ class Article extends BaseController
         foreach ($rows['items'] as &$item) {
             // 文章摘要为空时，返回部分文章内容
             if (empty($item['summary']) && !empty($item['content'])) {
-                $item['summary'] = mb_substr($item['content'], 0, 80);
+                $item['summary'] = mb_substr($item['content'], 0, 130);
             }
             unset($item['content']);
         }

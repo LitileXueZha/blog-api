@@ -19,3 +19,16 @@ CREATE FULLTEXT INDEX `ftx_article`
 ON `article` (`title`, `summary`, `content`)
 -- 使用内置的分词器，ngram 支持中日韩
 WITH PARSER ngram;
+
+
+-- 添加纯文本列
+ALTER TABLE `article`
+ADD COLUMN `text_content` text DEFAULT NULL COMMENT '纯文本内容，不是 md 格式'
+AFTER `content`;
+
+-- 修改索引。只能先删掉再创建
+DROP INDEX `ftx_article` on `article`;
+
+CREATE FULLTEXT INDEX `ftx_article`
+ON `article` (`title`, `summary`, `text_content`)
+WITH PARSER ngram;
