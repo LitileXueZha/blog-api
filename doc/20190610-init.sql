@@ -18,7 +18,7 @@ SET NAMES 'utf8mb4';
 -- 创建文章表 article
 CREATE TABLE `article` (
     `id` int(8) NOT NULL AUTO_INCREMENT,
-    `title` varchar(20) NOT NULL COMMENT '标题',
+    `title` varchar(25) NOT NULL COMMENT '标题',
     `summary` varchar(200) DEFAULT NULL COMMENT '简介',
     `content` text DEFAULT NULL COMMENT '文章内容',
     `text_content` text DEFAULT NULL COMMENT '纯文本内容，不是 md 格式',

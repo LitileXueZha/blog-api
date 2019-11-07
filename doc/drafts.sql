@@ -32,3 +32,7 @@ DROP INDEX `ftx_article` on `article`;
 CREATE FULLTEXT INDEX `ftx_article`
 ON `article` (`title`, `summary`, `text_content`)
 WITH PARSER ngram;
+
+-- 文章名增长到 25 个字
+ALTER TABLE `article`
+MODIFY COLUMN `title` varchar(25) NOT NULL COMMENT '标题';

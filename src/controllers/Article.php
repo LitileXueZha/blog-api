@@ -210,10 +210,10 @@ class Article extends BaseController
 
         foreach ($rows['items'] as &$item) {
             // 文章摘要为空时，返回部分文章内容
-            if (empty($item['summary']) && !empty($item['content'])) {
-                $item['summary'] = mb_substr($item['content'], 0, 130);
+            if (empty($item['summary']) && !empty($item['text_content'])) {
+                $item['summary'] = mb_substr($item['text_content'], 0, 130);
             }
-            unset($item['content']);
+            unset($item['text_content']);
         }
 
         $res = new Response(HttpCode::OK, $rows);

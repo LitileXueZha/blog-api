@@ -234,7 +234,7 @@ class Article
         $db = DB::init();
         $tb = self::NAME;
         // 查询格式
-        $format = "article_id as id, title, summary, content, modify_at";
+        $format = "article_id as id, title, summary, text_content, modify_at";
         // 分页
         [
             'limit' => $limit,
