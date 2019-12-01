@@ -55,6 +55,8 @@ CREATE TABLE `msg` (
     `content` varchar(250) NOT NULL COMMENT '留言内容',
     `avatar` varchar(128) DEFAULT NULL COMMENT '头像',
     `platform` enum('pc', 'mobile') NOT NULL COMMENT '留言平台',
+    `user_agent` char(140) DEFAULT NULL COMMENT '浏览器标识',
+    `read` boolean DEFAULT false COMMENT '博主是否已读',
 
     `msg_id` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '唯一短链型 id',
     `create_at` datetime DEFAULT CURRENT_TIMESTAMP,

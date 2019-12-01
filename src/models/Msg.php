@@ -23,7 +23,7 @@ class Msg
      * @var String
      */
     const FORMAT = "msg_id as id, name, content, avatar, platform,
-                    create_at";
+                    user_agent, `read`, create_at";
 
     /**
      * 创建留言
@@ -74,14 +74,18 @@ class Msg
         // 查询格式
         $format = self::FORMAT;
         // 分页
-        $limit = empty($options['limit']) ? '0, 10' : $options['limit'];
+        [
+            'limit' => $limit,
+            'orderBy' => $orderBy,
+        ] = DB::getOptsOrDefault($options);
 
         $columns = array_keys($params);
         $placeholder = implode(' AND ', array_map(function ($key) {
             return "$key = :$key";
         }, $columns));
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder LIMIT $limit";
+        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder
+                    ORDER BY $orderBy LIMIT $limit";
 
         $sql = $db->prepare($statement);
 
@@ -116,7 +120,7 @@ class Msg
         $columns = array_keys($data);
         // 占位符
         $placeholder = implode(',', array_map(function ($key) {
-            return "$key = :$key";
+            return "`$key` = :$key";
         }, $columns));
 
         // 筛选未逻辑删除

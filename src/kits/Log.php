@@ -84,6 +84,7 @@ class Log
     public static function debug($data)
     {
         header('Content-Type: application/json');
+        header('Access-Control-Allow-Origin: *');
         echo json_encode([
             'DEBUG' => true,
             'description' => '调试数据输出',

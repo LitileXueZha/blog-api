@@ -138,9 +138,9 @@ class Msg extends BaseController
         }
 
         // 可更新的字段
-        $keys = ['avatar'];
+        $keys = ['avatar', 'read'];
         // 管理后台可更新更多
-        $keysAdmin = ['avatar', 'name', 'content'];
+        $keysAdmin = ['avatar', 'read', 'name', 'content'];
         $data = Util::filter($data, $keys);
 
         // 无更新数据，返回 400

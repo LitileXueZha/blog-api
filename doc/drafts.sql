@@ -36,3 +36,12 @@ WITH PARSER ngram;
 -- 文章名增长到 25 个字
 ALTER TABLE `article`
 MODIFY COLUMN `title` varchar(25) NOT NULL COMMENT '标题';
+
+-- 留言表添加 user_agent、read 字段
+ALTER TABLE `msg`
+ADD COLUMN `user_agent` char(140) DEFAULT NULL COMMENT '浏览器标识'
+AFTER `platform`;
+
+ALTER TABLE `msg`
+ADD COLUMN `read` boolean DEFAULT false COMMENT '博主是否已读'
+AFTER `user_agent`;
