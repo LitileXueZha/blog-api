@@ -57,6 +57,7 @@ CREATE TABLE `msg` (
     `platform` enum('pc', 'mobile') NOT NULL COMMENT '留言平台',
     `user_agent` char(140) DEFAULT NULL COMMENT '浏览器标识',
     `read` boolean DEFAULT false COMMENT '博主是否已读',
+    `site` varchar(64) DEFAULT NULL COMMENT '留言人网站，友链备用',
 
     `msg_id` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '唯一短链型 id',
     `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
@@ -79,6 +80,7 @@ CREATE TABLE `comment` (
     `content` varchar(150) NOT NULL COMMENT '评论',
     `type` tinyint(1) NOT NULL COMMENT '评论类型：0-文章、1-留言',
     `parent_id` varchar(10) NOT NULL COMMENT '关联的文章、留言等 id',
+    `label` tinyint(1) DEFAULT 0 COMMENT '用户标签：0-普通用户、1-博主',
 
     `comment_id` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '唯一短链型 id',
     `create_at` datetime DEFAULT CURRENT_TIMESTAMP,

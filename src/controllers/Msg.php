@@ -94,7 +94,7 @@ class Msg extends BaseController
         }
 
         // 可供添加的字段
-        $keys = ['name', 'content', 'avatar', 'platform'];
+        $keys = ['name', 'content', 'avatar', 'platform', 'user_agent'];
         $data = Util::filter($data, $keys);
 
         $record = MM::add($data);
