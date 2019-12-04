@@ -57,11 +57,11 @@ class Comment extends BaseController
                 'required' => true,
                 'error' => '评论主体不能为空',
             ],
-            'name' => [
-                'type' => 'string',
-                'required' => true,
-                'error' => '评论人姓名不能为空',
-            ],
+            // 'name' => [
+            //     'type' => 'string',
+            //     'required' => true,
+            //     'error' => '评论人姓名不能为空',
+            // ],
             'content' => [
                 'type' => 'string',
                 'required' => true,
@@ -84,7 +84,7 @@ class Comment extends BaseController
         }
 
         // 可添加的字段
-        $keys = ['parent_id', 'name', 'content', 'type'];
+        $keys = ['parent_id', 'name', 'content', 'type', 'label'];
         $data = Util::filter($data, $keys);
 
         $record = MMC::add($data);
@@ -193,6 +193,28 @@ class Comment extends BaseController
 
         // 返回一个 NULL，代表着这个数据为空，被删掉了
         $res = new Response(HttpCode::OK, NULL);
+
+        $res->end();
+    }
+
+    /**
+     * 管理后台获取全部评论列表
+     * 
+     * @param Array 请求信息
+     */
+    public static function all($req)
+    {
+        $params = $req['data'];
+        $limit = self::getLimitByQuery($params);
+
+        // 可供查询的字段
+        $keys = ['parent_id', 'type', 'label'];
+        $params = Util::filter($params, $keys);
+
+        // 筛选未删除数据
+        $params['_d'] = 0;
+        $rows = MMC::get($params, ['limit' => $limit]);
+        $res = new Response(HttpCode::OK, $rows);
 
         $res->end();
     }

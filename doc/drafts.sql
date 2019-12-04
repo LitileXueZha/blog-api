@@ -46,5 +46,14 @@ ALTER TABLE `msg`
 ADD COLUMN `read` boolean DEFAULT false COMMENT '博主是否已读'
 AFTER `user_agent`;
 
+ALTER TABLE `msg`
+ADD COLUMN `site` varchar(64) DEFAULT NULL COMMENT '留言人网站，友链备用'
+AFTER `read`;
+
+-- 评论表添加用户标签
+ALTER TABLE `comment`
+ADD COLUMN `label` tinyint(1) DEFAULT 0 COMMENT '用户标签：0-普通用户、1-博主'
+AFTER `parent_id`;
+
 ALTER TABLE `comment`
 MODIFY COLUMN `name` varchar(20) DEFAULT NULL COMMENT '评论人姓名';

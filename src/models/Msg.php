@@ -23,7 +23,7 @@ class Msg
      * @var String
      */
     const FORMAT = "msg_id as id, name, content, avatar, platform,
-                    user_agent, `read`, create_at";
+                    user_agent, `read`, site, create_at";
 
     /**
      * 创建留言
@@ -98,6 +98,11 @@ class Msg
         $res = $sql->fetchAll();
         $sqlCount = $db->query("SELECT FOUND_ROWS()");
         $count = $sqlCount->fetch();
+
+        // 转化 read 字段为 boolean
+        foreach ($res as &$item) {
+            $item['read'] = boolval($item['read']);
+        }
 
         return [
             'total' => $count['FOUND_ROWS()'],
