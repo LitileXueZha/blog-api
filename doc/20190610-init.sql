@@ -76,7 +76,7 @@ COMMENT='留言表';
 -- 创建评论表 comment
 CREATE TABLE `comment` (
     `id` int(10) NOT NULL AUTO_INCREMENT,
-    `name` varchar(20) NOT NULL COMMENT '评论人姓名',
+    `name` varchar(20) DEFAULT NULL COMMENT '评论人姓名',
     `content` varchar(150) NOT NULL COMMENT '评论',
     `type` tinyint(1) NOT NULL COMMENT '评论类型：0-文章、1-留言',
     `parent_id` varchar(10) NOT NULL COMMENT '关联的文章、留言等 id',

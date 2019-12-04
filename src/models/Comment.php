@@ -23,7 +23,7 @@ class Comment
      * @var String
      */
     const FORMAT = 'comment_id as id, parent_id, name, content,
-                    type, create_at';
+                    type, label, create_at';
     
     /**
      * 添加一条评论
@@ -70,14 +70,18 @@ class Comment
         $tb = self::NAME;
         $format = self::FORMAT;
         // 分页
-        $limit = empty($options['limit']) ? '0, 10' : $options['limit'];
+        [
+            'limit' => $limit,
+            'orderBy' => $orderBy,
+        ] = DB::getOptsOrDefault($options);
 
         $columns = array_keys($params);
         $placeholder = implode(' AND ', array_map(function ($key) {
             return "$key = :$key";
         }, $columns));
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder LIMIT $limit";
+        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder
+                    ORDER BY $orderBy LIMIT $limit";
 
         $sql = $db->prepare($statement);
 

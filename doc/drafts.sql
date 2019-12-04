@@ -45,3 +45,6 @@ AFTER `platform`;
 ALTER TABLE `msg`
 ADD COLUMN `read` boolean DEFAULT false COMMENT '博主是否已读'
 AFTER `user_agent`;
+
+ALTER TABLE `comment`
+MODIFY COLUMN `name` varchar(20) DEFAULT NULL COMMENT '评论人姓名';
