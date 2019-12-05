@@ -54,7 +54,7 @@ $route
     ->get('/comments/:id', 'Comment::read') // 获取单条评论
     ->put('/comments/:id', 'Comment::update') // 更新单条评论
     ->delete('/comments/:id', 'Comment::delete') // 删除单条评论
-    ->get('/comments/all', 'Comment::all') // 管理后台获取全部评论数据
+    ->get('/comments/all', 'Comment::verbose') // 管理后台获取全部评论数据
 
     // 其它
     ->get('/search', 'Search::list') // 搜索

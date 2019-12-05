@@ -202,7 +202,7 @@ class Comment extends BaseController
      * 
      * @param Array 请求信息
      */
-    public static function all($req)
+    public static function verbose($req)
     {
         $params = $req['data'];
         $limit = self::getLimitByQuery($params);
