@@ -6,10 +6,10 @@
  * 使用：
  * ```php
  * new DBStatement('table name', 'joined table')
- *     ->select(['id', 'create_at as createAt', '__JOIN__' => ['name', 'name as n']])
- *     ->on('tag', 'tag_name')
- *     ->on('a', 'b')
- *     ->where(['name', 'age' => 5, '__WHERE__' => ['a', 'b']])
+ *     ->select('id', 'create_at as createAt', 'tb1.name as n')
+ *     ->on('tb1.tag', 'tb2.tag_name')
+ *     ->on('tb1.a', 'tb2.b')
+ *     ->where(['name', 'age' => 5, '__WHERE__' => 'tb1.age > 10 OR tb2.name IS NULL'])
  *     ->limit('2, 10')
  *     ->orderBy('create_at DESC')
  *     ->end();
@@ -69,34 +69,14 @@ class DBStatement
     /**
      * SQL 语句类型之 `SELECT`
      * 
-     * 格式化要查询的字段。例如 ['name', 'name as n'] => "name,name as n"
+     * 拼接要查询的字段。例如 `select('name', 'tb1.name as n', 'tb2.age')`
+     * => "name,tb1.name as n,tb2.age"
      * 
      * @param Array
      */
-    public function select($keys)
+    public function select(...$keys)
     {
-        $tb = $this->tb;
-        $tbJoin = $this->tbJoin;
-        $keysArr = $keys;
-
-        // 有连接表时特殊处理
-        if (isset($tbJoin)) {
-            $keysArr = [];
-
-            foreach ($keys as $index => $key) {
-                if ($index === '__JOIN__') {
-                    // 指明获取连接表的字段
-                    foreach ($key as $keyJoin) {
-                        $keysArr[] = "$tbJoin.$keyJoin";
-                    }
-                    continue;
-                }
-
-                $keysArr[] = "$tb.$key";
-            }
-        }
-
-        $keyStr = implode(',', $keysArr);
+        $keyStr = implode(',', $keys);
 
         // 挂载到 opts 上
         $this->opts['FORMAT'] = $keyStr;
@@ -131,18 +111,17 @@ class DBStatement
                 $where = $this->opts['WHERE'];
                 $orderBy = $this->opts['ORDER BY'];
                 $limit = $this->opts['LIMIT'];
+                $join = '';
 
-                if (isset($tbJoin)) {
+                // 存在连接表时，设置之
+                if ($tbJoin) {
                     $on = $this->opts['ON'];
-                    $statement = "SELECT SQL_CALC_FOUND_ROWS FROM $tb
-                                LEFT JOIN $tbJoin ON $on
-                                WHERE $where ORDER BY $tb.$orderBy LIMIT $limit";
-                } else {
-                    $statement = "SELECT SQL_CALC_FOUND_ROWS FROM $tb
-                                WHERE $where ORDER BY $tb.$orderBy LIMIT $limit";
+                    $join = "LEFT JOIN $tbJoin ON $on";
                 }
+                
+                $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb $join $where $orderBy $limit";
 
-                return $statement;
+                break;
             }
             case self::INSERT:
             break;
@@ -153,36 +132,81 @@ class DBStatement
             default:
                 return;
         }
+
+        return $statement;
     }
 
     /**
      * 条件 `WHERE`。目前支持的方式：
      * + `AND` 逻辑与
      * + `IN` 多数据之一 enum
+     * + `__WHERE__` 自定义复杂的查询，将直接拼接不作处理
      * 
-     * 例子：`['id', 'name as n', 'age' => 5]`
+     * 例子：`['id', 'age' => 5, '__WHERE__' => 'tb.sex IS NULL']`
      * 
      * 当出现键值对而不是普通的字符串时，表明使用 IN 方式，
-     * 将会转化为 `$key IN (:$key$index, :$key$index)`，
+     * 将会转化为 `tb.$key IN (:$key$index, :$key$index)`，
      * 指定第二个参数可改变转化方式。下面是个参考
      * 
      * ```php
      * $->where(['age' => 5], function ($key, $index) {
-     *     return ":$key$index";
+     *     return ":$key__$index";
      * });
      * ```
      * 
-     * @param Array 要查询的列名。例如：['id', 'name as n', 'age' => 5]
+     * @param Array 要查询的条件列名。例如：['id', 'age' => 5]
      * @param Function 转化 in 查询的方法。默认转为 `$key$index`
      */
-    public function where($keys, $in = NULL)
+    public function where($keys, $func = NULL)
     {
-        $this->opts['WHERE'] = $keys;
-        $this->opts['IN'] = $in;
+        $keyArr = [];
+        $reg = '/^(\w+\.)/'; // 匹配表前缀
+
+        foreach ($keys as $index => $key) {
+            // 1. 单字段转化
+            if (is_int($index)) {
+                // 删除表前缀
+                $column = preg_replace($reg, '', $key);
+                $keyArr[] = "$key=:$column";
+                continue;
+            }
+
+            // 2. 自定义复杂表条件，直接拼接
+            if ($index === '__WHERE__') {
+                $keyArr[] = $key;
+                continue;
+            }
+
+            // 3. 多数据之一查询
+            // 吐血的 PDO 不支持直接 IN (1,2,3) 形式，只能一个个绑定
+            // @link https://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
+            $column = preg_replace($reg, '', $index);
+            $range = range(0, $key - 1);
+            $inArr = [];
+            
+            foreach ($range as $i) {
+                $inArr[] = $func ? $func($column, $i) : ":$column$i";
+            }
+            
+            $inStr = implode(',', $inArr);
+            $keyArr[] = "$index IN ($inStr)";
+        }
+
+        $keys = array_map(function () {}, $keys);
+        $keyStr = implode(' AND ', $keyArr);
+
+        $this->opts['WHERE'] = $keyStr;
 
         return $this;
     }
 
+    /**
+     * 分页设置
+     * 
+     * 默认 `0,10`
+     * 
+     * @param String 分页字符串
+     */
     public function limit($limit)
     {
         $this->opts['LIMIT'] = "LIMIT $limit";
@@ -190,22 +214,49 @@ class DBStatement
         return $this;
     }
 
+    /**
+     * 排序设置
+     * 
+     * 默认 `create_at DESC`。有连接表时，以主表为准
+     * 
+     * @param String 排序字段
+     */
     public function orderBy($orderBy)
     {
+        $tb = $this->tb;
+        $tbJoin = $this->tbJoin;
+
+        // 存在连接表时，以主表字段排序
+        if ($tbJoin) {
+            $orderBy = "$tb.$orderBy";
+        }
+
         $this->opts['ORDER BY'] = "ORDER BY $orderBy";
 
         return $this;
     }
 
-    public function join($tbname)
+    /**
+     * 指定连接表字段
+     * 
+     * 转化示例：`on('tb1.tag', 'tb2.tag_name')` 将会 "ON tb1.tag=tb2.tag_name"
+     * 
+     * @param String 字段1
+     * @param String 字段2
+     */
+    public function on($column1, $column2)
     {
-        $this->opts['LEFT JOIN'] = $tbname;
+        $on = $this->opts['ON'];
+
+        if ($on) {
+            // 持续叠加
+            $on .= ",$column1=$column2";
+        } else {
+            $on = "ON $column1=$column2";
+        }
+
+        $this->opts['ON'] = $on;
 
         return $this;
-    }
-
-    public function on($keys)
-    {
-        $this->opts['ON'] = $keys;
     }
 }
