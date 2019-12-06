@@ -3,6 +3,13 @@
 /**
  * SQL 语句工具
  * 
+ * 目前支持三种类型：
+ * + `select()` 查询
+ * + `insert()` 插入
+ * + `update()` 更新
+ * 
+ * 相对简单的语句其实可以直接写 SQL
+ * 
  * 使用：
  * ```php
  * new DBStatement('table name', 'joined table')
@@ -12,7 +19,16 @@
  *     ->where(['name', 'age' => 5, '__WHERE__' => 'tb1.age > 10 OR tb2.name IS NULL'])
  *     ->limit('2, 10')
  *     ->orderBy('create_at DESC')
- *     ->end();
+ *     ->toString();
+ * 
+ * new DBStatement('table name')
+ *     ->insert(['id', 'name'])
+ *     ->toString();
+ * 
+ * new DBStatement('table name)
+ *     ->update(['name', 'age'])
+ *     ->where(['id', '__WHERE__' => '_d=0'])
+ *     ->toString();
  * ```
  */
 
@@ -22,7 +38,7 @@ class DBStatement
     const SELECT = 1;
     const UPDATE = 2;
     const INSERT = 3;
-    const DELETE = 4;
+    // const DELETE = 4; // 暂不提供此破坏性方法
 
     /**
      * 表名称
@@ -87,11 +103,47 @@ class DBStatement
     }
 
     /**
-     * SQL 语句类型之 `DELETE`
+     * SQL 语句类型之 `INSERT`
+     * 
+     * 快捷转化占位字符。例如 `insert(['a', 'b'])` => 'a,b'、':a,:b'
+     * 
+     * @param Array 要插入的列名数组
      */
-    public function delete()
+    public function insert($keys)
     {
-        // TODO:
+        // 转化占位符
+        $keyStr = implode(',', $keys);
+        $bindStr = implode(',', array_map(function ($col) {
+            return ":$col";
+        }, $keys));
+
+        // 挂载 opts
+        $this->opts['INSERT_COL'] = $keyStr;
+        $this->opts['INSERT_VALUES'] = $bindStr;
+        $this->type = self::INSERT;
+
+        return $this;
+    }
+
+    /**
+     * SQL 语句类型之 `UPDATE`
+     * 
+     * 快捷转化占位字符。相对简单的语句其实可以直接写 SQL
+     * 
+     * @param Array 要更新的列名数组
+     */
+    public function update($keys)
+    {
+        // 转化占位符
+        $keyStr = implode(',', array_map(function ($col) {
+            return "$col=:$col";
+        }, $keys));
+
+        // 挂载 opts
+        $this->opts['UPDATE_COL'] = $keyStr;
+        $this->type = self::UPDATE;
+
+        return $this;
     }
 
     /**
@@ -99,7 +151,7 @@ class DBStatement
      * 
      * @return String SQL 语句
      */
-    public function end()
+    public function toString()
     {
         $statement = '';
 
@@ -116,7 +168,7 @@ class DBStatement
                 // 存在连接表时，设置之
                 if ($tbJoin) {
                     $on = $this->opts['ON'];
-                    $join = "LEFT JOIN $tbJoin ON $on";
+                    $join = "LEFT JOIN $tbJoin $on";
                 }
                 
                 $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb $join $where $orderBy $limit";
@@ -124,11 +176,19 @@ class DBStatement
                 break;
             }
             case self::INSERT:
-            break;
+                $tb = $this->tb;
+                $col = $this->opts['INSERT_COL'];
+                $values = $this->opts['INSERT_VALUES'];
+                $statement = "INSERT INTO $tb ($col) VALUES ($values)";
+
+                break;
             case self::UPDATE:
-            break;
-            case self::DELETE:
-                return;
+                $tb = $this->tb;
+                $col = $this->opts['UPDATE_COL'];
+                $where = @$this->opts['WHERE'];
+                $statement = "UPDATE $tb SET $col $where";
+
+                break;
             default:
                 return;
         }
@@ -195,7 +255,7 @@ class DBStatement
         $keys = array_map(function () {}, $keys);
         $keyStr = implode(' AND ', $keyArr);
 
-        $this->opts['WHERE'] = $keyStr;
+        $this->opts['WHERE'] = "WHERE $keyStr";
 
         return $this;
     }
@@ -246,13 +306,14 @@ class DBStatement
      */
     public function on($column1, $column2)
     {
-        $on = $this->opts['ON'];
+        $on = empty($this->opts['ON']);
 
         if ($on) {
-            // 持续叠加
-            $on .= ",$column1=$column2";
-        } else {
             $on = "ON $column1=$column2";
+        } else {
+            // 持续叠加
+            $on = $this->opts['ON'];
+            $on .= ",$column1=$column2";
         }
 
         $this->opts['ON'] = $on;
