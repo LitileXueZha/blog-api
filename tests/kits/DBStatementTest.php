@@ -20,7 +20,8 @@ class DBStatementTest extends \PHPUnit\Framework\TestCase
         $statement = $dbs->toString();
         $exp1 = "SELECT SQL_CALC_FOUND_ROWS article_id as id,title,content,create_at FROM article";
         $join = '';
-        $exp2 = "WHERE _d=0 ORDER BY create_at DESC LIMIT 2,10";
+        $orderBy = '';
+        $exp2 = "WHERE _d=0 $orderBy LIMIT 2,10";
         $expect = "$exp1 $join $exp2";
         
         $this->assertEquals($expect, $statement);

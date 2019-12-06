@@ -113,12 +113,13 @@ class Tag
         $tb = self::NAME;
 
         $columns = array_keys($data);
-        $placeholder = implode(',', array_map(function ($key) {
-            return "$key = :$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        $statement = "UPDATE $tb SET $placeholder WHERE `name`=:id AND _d=0";
+        // dbs 操作
+        $dbs->update($columns)
+            ->where(['__WHERE__' => 'name=:id AND _d=0']);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         foreach ($data as $key => $value) {

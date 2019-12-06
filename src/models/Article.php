@@ -90,16 +90,9 @@ class Article
 
         // dbs 查询
         $dbs->select(
-                "$tb.article_id as id",
-                "$tb.title",
-                "$tb.summary",
-                "$tb.content",
-                "$tb.tag",
+                "$tb.article_id as id, $tb.title, $tb.summary, $tb.content, $tb.tag",
                 "$tbJoin.display_name as tag_name",
-                "$tb.status",
-                "$tb.category",
-                "$tb.bg",
-                "$tb.create_at"
+                "$tb.status, $tb.category, $tb.bg, $tb.create_at",
             )
             ->on("$tb.tag", "$tbJoin.name")
             ->where($columns)
@@ -213,7 +206,6 @@ class Article
         // 只需要查询文本搜索的几个字段，并添加一列 type 固定值为 article
         $dbs->select("article_id as id, title, summary, text_content, 'article' as type, create_at")
             ->where(['__WHERE__' => "_d=0 AND match(title, summary, text_content) against($q)"])
-            ->orderBy($orderBy)
             ->limit($limit);
 
         // 默认 IN NATURAL LANGUAGE MODE

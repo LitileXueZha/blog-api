@@ -72,8 +72,12 @@ class DBStatement
      * @var Array
      */
     private $opts = [
-        'LIMIT' => 'LIMIT 0, 10', // 默认分页 10 条
-        'ORDER BY' => 'ORDER BY create_at DESC',  // 默认创建时间倒序
+        // 解决 undefined index
+        'WHERE' => NULL,
+        'ORDER BY' => NULL,
+        'LIMIT' => NULL
+        // 'LIMIT' => 'LIMIT 0, 10', // 默认分页 10 条
+        // 'ORDER BY' => 'ORDER BY create_at DESC',  // 默认创建时间倒序
     ];
 
     function __construct($tbname, $tbJoin = NULL)
@@ -154,20 +158,21 @@ class DBStatement
     public function toString()
     {
         $statement = '';
+        $tb = $this->tb;
+        $opts = $this->opts;
 
         switch ($this->type) {
             case self::SELECT: {
-                $tb = $this->tb;
                 $tbJoin = $this->tbJoin;
-                $format = $this->opts['FORMAT'];
-                $where = $this->opts['WHERE'];
-                $orderBy = $this->opts['ORDER BY'];
-                $limit = $this->opts['LIMIT'];
+                $format = $opts['FORMAT'];
+                $where = $opts['WHERE'];
+                $orderBy = $opts['ORDER BY'];
+                $limit = $opts['LIMIT'];
                 $join = '';
 
                 // 存在连接表时，设置之
                 if ($tbJoin) {
-                    $on = $this->opts['ON'];
+                    $on = $opts['ON'];
                     $join = "LEFT JOIN $tbJoin $on";
                 }
                 
@@ -176,16 +181,14 @@ class DBStatement
                 break;
             }
             case self::INSERT:
-                $tb = $this->tb;
-                $col = $this->opts['INSERT_COL'];
-                $values = $this->opts['INSERT_VALUES'];
+                $col = $opts['INSERT_COL'];
+                $values = $opts['INSERT_VALUES'];
                 $statement = "INSERT INTO $tb ($col) VALUES ($values)";
 
                 break;
             case self::UPDATE:
-                $tb = $this->tb;
-                $col = $this->opts['UPDATE_COL'];
-                $where = @$this->opts['WHERE'];
+                $col = $opts['UPDATE_COL'];
+                $where = $opts['WHERE'];
                 $statement = "UPDATE $tb SET $col $where";
 
                 break;
