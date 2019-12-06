@@ -204,10 +204,7 @@ class Article
         $tb = self::NAME;
 
         // 分页
-        [
-            'limit' => $limit,
-            'orderBy' => $orderBy,
-        ] = DB::getOptsOrDefault($options);
+        $limit = DB::getOptsOrDefault($options)['limit'];
         // 防 sql 注入，转义之
         $q = $db->quote($q);
         $dbs = new DBStatement($tb);

@@ -8,6 +8,8 @@ namespace TC\Model;
 
 require_once __DIR__.'/DB.php';
 
+use DBStatement;
+
 class Tag
 {
     /**
@@ -37,11 +39,12 @@ class Tag
         $tb = self::NAME;
 
         $columns = array_keys($data);
-        [$col, $placeholder] = DB::getPlaceholderByKeys($columns);
+        $dbs = new DBStatement($tb);
 
-        // 执行语句
-        $statement = "INSERT INTO $tb ($col) VALUES ($placeholder)";
+        // dbs 操作
+        $dbs->insert($columns);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         // 绑定参数
@@ -49,6 +52,7 @@ class Tag
             $sql->bindValue(":$key", $value);
         }
 
+        // 执行语句
         $sql->execute();
 
         $res = self::get(['name' => $data['name'], '_d' => 0]);
@@ -67,16 +71,17 @@ class Tag
     {
         $db = DB::init();
         $tb = self::NAME;
-        $format = self::FORMAT;
+
         $orderBy = DB::getOptsOrDefault($options)['orderBy'];
-
         $columns = array_keys($params);
-        $placeholder = implode(' AND ', array_map(function ($key) {
-            return "$key = :$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder ORDER BY $orderBy";
+        // dbs 查询
+        $dbs->select('name as id, display_name as name, click, status, create_at')
+            ->where($columns)
+            ->orderBy($orderBy);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         foreach ($columns as $key) {
