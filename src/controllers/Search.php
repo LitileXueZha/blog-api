@@ -50,7 +50,7 @@ class Search extends BaseController
 
             // NOTE: 只返回精确匹配到的数据
             // FIXME: 分页会有问题！只是简单的筛除，数据库分页对不上了。考虑用 redis 缓存搜索结果
-            if (!$result) {
+            if (!$result && !preg_match($keyword, $row['title'])) {
                 $total --;
                 continue;
             }
@@ -58,7 +58,7 @@ class Search extends BaseController
             // 拼接 url，目前只有 文章
             $row['url'] = '/articles/detail?id='. $row['id'];
             // 数据转化
-            $row['summary'] = $result;
+            $row['summary'] = $result ?: $row['summary'] ?: $row['text_content'];
             unset($row['text_content']);
 
             $searchRows[] = $row;

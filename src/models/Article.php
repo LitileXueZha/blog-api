@@ -8,6 +8,8 @@ namespace TC\Model;
 
 require_once __DIR__.'/DB.php';
 
+use DBStatement;
+
 class Article
 {
     /**
@@ -16,14 +18,6 @@ class Article
      * @var String
      */
     const NAME = 'article';
-
-    /**
-     * 查询返回格式
-     * 
-     * @var String
-     */
-    const FORMAT = 'article_id as id, title, summary, content, tag,
-                    status, category, bg, create_at';
 
     /**
      * 添加一条文章
@@ -38,12 +32,13 @@ class Article
 
         // 唯一 id 生成
         $data['article_id'] = DB::shortId();
-
         $columns = array_keys($data);
-        [$col, $placeholder] = DB::getPlaceholderByKeys($columns);
-        
-        $statement = "INSERT INTO $tb ($col) VALUES ($placeholder)";
+        $dbs = new DBStatement($tb);
 
+        // dbs 操作
+        $dbs->insert($columns);
+        
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         // 绑定参数
@@ -71,48 +66,54 @@ class Article
         $db = DB::init();
         $tb = self::NAME;
         $tbJoin = 'tag';
-        $join = "LEFT JOIN $tbJoin ON $tb.tag=$tbJoin.name";
-        // 查询格式
-        $format = "$tb.article_id as id, $tb.title, $tb.summary, $tb.content,
-                    $tb.tag, $tbJoin.display_name as tag_name, $tb.status, $tb.category,
-                    $tb.bg, $tb.create_at";
         // 分页
         [
             'limit' => $limit,
             'orderBy' => $orderBy,
         ] = DB::getOptsOrDefault($options);
-
-        $columns = array_keys($params);
-        $placeholder  = implode(' AND ', array_map(function ($key) use ($tb, $params) {
-            $param = $params[$key];
-
+        $columns = [];
+        
+        // 列名转化成 dbs 需要的 where 参数
+        foreach ($params as $key => $param) {
             if (is_array($param)) {
                 // 复杂的 sql 数组型参数查询
                 // 吐血的 PDO 不支持直接 IN (1,2,3) 形式，只能一个个绑定
                 // @link https://stackoverflow.com/questions/14767530/php-using-pdo-with-in-clause-array
-                $str = [];
-
-                foreach ($param as $i => $value) {
-                    $str[] = ":$key$i";
-                }
-                $str = implode(',', $str);
-
-                return "$tb.$key IN ($str)";
+                $columns["$tb.$key"] = count($param);
+                continue;
             }
 
-            return "$tb.$key = :$key";
-        }, $columns));
+            $columns[] = "$tb.$key";
+        }
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb $join
-                    WHERE $placeholder ORDER BY $tb.$orderBy LIMIT $limit";
+        $dbs = new DBStatement($tb, $tbJoin);
 
+        // dbs 查询
+        $dbs->select(
+                "$tb.article_id as id",
+                "$tb.title",
+                "$tb.summary",
+                "$tb.content",
+                "$tb.tag",
+                "$tbJoin.display_name as tag_name",
+                "$tb.status",
+                "$tb.category",
+                "$tb.bg",
+                "$tb.create_at"
+            )
+            ->on("$tb.tag", "$tbJoin.name")
+            ->where($columns)
+            ->limit($limit)
+            ->orderBy($orderBy);
+
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
-        foreach ($columns as $key) {
-            $param = $params[$key];
-
+        // 绑定参数
+        foreach ($params as $key => $param) {
             if (is_array($param)) {
                 // 复杂的 sql 数组型参数查询
+                // 这里应该参考 DBStatement 中 where 的转化
                 foreach ($param as $i => $val) {
                     $sql->bindValue(":$key$i", $val);
                 }
@@ -148,17 +149,18 @@ class Article
         $tb = self::NAME;
 
         $columns = array_keys($data);
-        $placeholder = implode(',', array_map(function ($key) {
-            return "$key=:$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        // 筛选未逻辑删除
-        $statement = "UPDATE $tb SET $placeholder WHERE article_id=:id AND _d=0";
+        // dbs 操作
+        $dbs->update($columns)
+            // 筛选未逻辑删除
+            ->where(['__WHERE__' => 'article_id=:id AND _d=0']);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
-        foreach ($columns as $key) {
-            $sql->bindValue(":$key", $data[$key]);
+        foreach ($data as $key => $value) {
+            $sql->bindValue(":$key", $value);
         }
         // 防止 id 被 sql 注入
         $sql->bindValue(':id', $id);
@@ -200,16 +202,25 @@ class Article
     {
         $db = DB::init();
         $tb = self::NAME;
-        // 查询格式。只需要查询文本搜索的几个字段，并添加一列 type 固定值为 article
-        $format = "article_id as id, title, summary, text_content, 'article' as type, create_at";
+
         // 分页
-        $limit = empty($options['limit']) ? '0, 10' : $options['limit'];
+        [
+            'limit' => $limit,
+            'orderBy' => $orderBy,
+        ] = DB::getOptsOrDefault($options);
         // 防 sql 注入，转义之
         $q = $db->quote($q);
+        $dbs = new DBStatement($tb);
+
+        // dbs 查询
+        // 只需要查询文本搜索的几个字段，并添加一列 type 固定值为 article
+        $dbs->select("article_id as id, title, summary, text_content, 'article' as type, create_at")
+            ->where(['__WHERE__' => "_d=0 AND match(title, summary, text_content) against($q)"])
+            ->orderBy($orderBy)
+            ->limit($limit);
 
         // 默认 IN NATURAL LANGUAGE MODE
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE _d=0 AND
-                        match(title, summary, text_content) against($q) LIMIT $limit";
+        $statement = $dbs->toString();
 
         $sql = $db->query($statement);
         $sqlCount = $db->query("SELECT FOUND_ROWS()");
@@ -233,26 +244,25 @@ class Article
     {
         $db = DB::init();
         $tb = self::NAME;
-        // 查询格式
-        $format = "article_id as id, title, summary, text_content, modify_at";
         // 分页
         [
             'limit' => $limit,
             'orderBy' => $orderBy,
         ] = DB::getOptsOrDefault($options);
-
         $columns = array_keys($params);
-        $placeholder  = implode(' AND ', array_map(function ($key) {
-            return "$key = :$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb
-                    WHERE $placeholder ORDER BY $orderBy LIMIT $limit";
+        // dbs 查询
+        $dbs->select('article_id as id, title, summary, text_content, modify_at')
+            ->where($columns)
+            ->orderBy($orderBy)
+            ->limit($limit);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
-        foreach ($columns as $key) {
-            $sql->bindValue(":$key", $params[$key]);
+        foreach ($params as $key => $value) {
+            $sql->bindValue(":$key", $value);
         }
 
         $sql->execute();
