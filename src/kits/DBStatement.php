@@ -140,7 +140,7 @@ class DBStatement
     {
         // 转化占位符
         $keyStr = implode(',', array_map(function ($col) {
-            return "$col=:$col";
+            return "`$col`=:$col";
         }, $keys));
 
         // 挂载 opts

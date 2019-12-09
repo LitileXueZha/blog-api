@@ -78,7 +78,7 @@ class DBStatementTest extends \PHPUnit\Framework\TestCase
             ->where(['__WHERE__' => 'foo_id=:id AND _d=0']);
         
         $statement = $dbs->toString();
-        $expect = 'UPDATE person SET name=:name,age=:age WHERE foo_id=:id AND _d=0';
+        $expect = 'UPDATE person SET `name`=:name,`age`=:age WHERE foo_id=:id AND _d=0';
 
         $this->assertEquals($expect, $statement);
 
@@ -89,7 +89,7 @@ class DBStatementTest extends \PHPUnit\Framework\TestCase
 
         $statement = $dbs->toString();
         $where = '';
-        $expect = "UPDATE person SET id=:id,age=:age $where";
+        $expect = "UPDATE person SET `id`=:id,`age`=:age $where";
 
         $this->assertEquals($expect, $statement);
     }

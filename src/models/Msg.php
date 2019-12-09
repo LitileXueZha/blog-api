@@ -8,6 +8,8 @@ namespace TC\Model;
 
 require_once __DIR__.'/DB.php';
 
+use DBStatement;
+
 class Msg
 {
     /**
@@ -16,14 +18,6 @@ class Msg
      * @var String
      */
     const NAME = 'msg';
-
-    /**
-     * 查询返回格式
-     * 
-     * @var String
-     */
-    const FORMAT = "msg_id as id, name, content, avatar, platform,
-                    user_agent, `read`, site, create_at";
 
     /**
      * 创建留言
@@ -41,10 +35,12 @@ class Msg
 
         // 获取 sql 语句占位符
         $columns = array_keys($data);
-        [$col, $placeholder] = DB::getPlaceholderByKeys($columns);
+        $dbs = new DBStatement($tb);
 
-        $statement = "INSERT INTO $tb ($col) VALUES ($placeholder)";
+        // dbs 操作
+        $dbs->insert($columns);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         // 绑定数据。烦
@@ -71,8 +67,6 @@ class Msg
     {
         $db = DB::init();
         $tb = self::NAME;
-        // 查询格式
-        $format = self::FORMAT;
         // 分页
         [
             'limit' => $limit,
@@ -80,13 +74,18 @@ class Msg
         ] = DB::getOptsOrDefault($options);
 
         $columns = array_keys($params);
-        $placeholder = implode(' AND ', array_map(function ($key) {
-            return "$key = :$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder
-                    ORDER BY $orderBy LIMIT $limit";
+        // dbs 查询
+        $dbs->select(
+                'msg_id as id, name, content, avatar, platform',
+                'user_agent, `read`, site, create_at'
+            )
+            ->where($columns)
+            ->orderBy($orderBy)
+            ->limit($limit);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         foreach ($params as $key => $value) {
@@ -101,7 +100,7 @@ class Msg
 
         // 转化 read 字段为 boolean
         foreach ($res as &$item) {
-            $item['read'] = boolval($item['read']);
+            $item['read'] = (bool) $item['read'];
         }
 
         return [
@@ -123,14 +122,14 @@ class Msg
         $tb = self::NAME;
 
         $columns = array_keys($data);
-        // 占位符
-        $placeholder = implode(',', array_map(function ($key) {
-            return "`$key` = :$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        // 筛选未逻辑删除
-        $statement = "UPDATE $tb SET $placeholder WHERE msg_id=:id AND _d=0";
+        // dbs 操作
+        $dbs->update($columns)
+            // 筛选未逻辑删除
+            ->where(['__WHERE__' => 'msg_id=:id AND _d=0']);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         // 绑定数据
