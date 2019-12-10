@@ -8,6 +8,8 @@ namespace TC\Model;
 
 require_once __DIR__.'/DB.php';
 
+use DBStatement;
+
 class Comment
 {
     /**
@@ -40,10 +42,12 @@ class Comment
         $data['comment_id'] = DB::shortId();
 
         $columns = array_keys($data);
-        [$col, $placeholder] = DB::getPlaceholderByKeys($columns);
+        $dbs = new DBStatement($tb);
 
-        $statement = "INSERT INTO $tb ($col) VALUES ($placeholder)";
+        // dbs 操作
+        $dbs->insert($columns);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         foreach ($data as $key => $value) {
@@ -68,7 +72,6 @@ class Comment
     {
         $db = DB::init();
         $tb = self::NAME;
-        $format = self::FORMAT;
         // 分页
         [
             'limit' => $limit,
@@ -76,13 +79,15 @@ class Comment
         ] = DB::getOptsOrDefault($options);
 
         $columns = array_keys($params);
-        $placeholder = implode(' AND ', array_map(function ($key) {
-            return "$key = :$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        $statement = "SELECT SQL_CALC_FOUND_ROWS $format FROM $tb WHERE $placeholder
-                    ORDER BY $orderBy LIMIT $limit";
+        // dbs 查询
+        $dbs->select('comment_id as id, parent_id, name, content, type, label, create_at')
+            ->where($columns)
+            ->orderBy($orderBy)
+            ->limit($limit);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         foreach ($params as $key => $value) {
@@ -114,13 +119,14 @@ class Comment
         $tb = self::NAME;
 
         $columns = array_keys($data);
-        $placeholder = implode(',', array_map(function ($key) {
-            return "$key = :$key";
-        }, $columns));
+        $dbs = new DBStatement($tb);
 
-        // 筛选未逻辑删除
-        $statement = "UPDATE $tb SET $placeholder WHERE comment_id=:id AND _d=0";
+        // dbs 操作
+        $dbs->update($columns)
+            // 筛选未逻辑删除
+            ->where(['__WHERE__' => 'comment_id=:id AND _d=0']);
 
+        $statement = $dbs->toString();
         $sql = $db->prepare($statement);
 
         foreach ($data as $key => $value) {
