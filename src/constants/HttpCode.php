@@ -8,6 +8,7 @@ class HttpCode
 {
     // 成功
     const OK = 200;
+    const NO_CONTENT = 204;
 
     // 重定向
     const MOVED_PERMANENTLY = 301;

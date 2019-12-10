@@ -122,15 +122,6 @@ class Response
     // 返回数据
     public function end()
     {
-        // 设置返回状态码
-        $response = [
-            'code' => $this->code,
-        ];
-
-        // 设置返回数据
-        if ($this->code === self::CODE_SUCCESS) $response['data'] = $this->data;
-        else $response['error'] = $this->error;
-
         // 设置 HTTP code
         http_response_code($this->httpCode);
 
@@ -141,6 +132,21 @@ class Response
             header($this->headers[$i]);
         }
 
+        // 指明不要返回任何内容
+        if ($this->httpCode === HttpCode::NO_CONTENT) {
+            echo NULL;
+            exit();
+        }
+
+        // 设置返回状态码
+        $response = [
+            'code' => $this->code,
+        ];
+
+        // 设置返回数据
+        if ($this->code === self::CODE_SUCCESS) $response['data'] = $this->data;
+        else $response['error'] = $this->error;
+
         // JSON_FORCE_OBJECT 将数组转为 {}
         // JSON_UNESCAPED_UNICODE 保持中文数据，不转 \uxxxx 类型
         $json = json_encode($response, JSON_UNESCAPED_UNICODE);
@@ -149,7 +155,7 @@ class Response
         if ($json === false) {
             throw new Exception('json_last_error: '. json_last_error());
         }
-        
+
         echo $json;
 
         // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）

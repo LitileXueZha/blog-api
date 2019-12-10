@@ -13,7 +13,7 @@ class Auth implements Middleware
     public function execute($app, $next)
     {
         if ($app::$req['method'] === 'OPTIONS') {
-            $res = new Response(HttpCode::OK);
+            $res = new Response(HttpCode::NO_CONTENT);
             $res->end();
             // 取消跳转剩下的中间件，直接跳过
             // $next();
