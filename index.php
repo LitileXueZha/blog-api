@@ -58,8 +58,8 @@ $route
 
     // 其它
     ->get('/search', 'Search::list') // 搜索
-    ->get('/user', 'aa')
-    ->delete('/user', 'aa')
+    ->post('/user/login', 'aa') // 管理用户登录
+    ->get('/oauth', 'aa') // 获取 API 访问令牌
     ->get('/user/:id', 'aa')
     ->get('/example/**', 'aa');
 

@@ -27,6 +27,9 @@ $config = [
     'DB_PASSWORD' => '123456',
 
     'DIR_ROOT' => __DIR__,
+
+    // 接口加密秘钥
+    'API_SECRET' => 'Mr.tao is handsome!',
 ];
 
 /**
