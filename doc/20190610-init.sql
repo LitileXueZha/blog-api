@@ -55,7 +55,7 @@ CREATE TABLE `msg` (
     `content` varchar(250) NOT NULL COMMENT '留言内容',
     `avatar` varchar(128) DEFAULT NULL COMMENT '头像',
     `platform` enum('pc', 'mobile') NOT NULL COMMENT '留言平台',
-    `user_agent` char(140) DEFAULT NULL COMMENT '浏览器标识',
+    `user_agent` varchar(150) DEFAULT NULL COMMENT '浏览器标识',
     `read` boolean DEFAULT false COMMENT '博主是否已读',
     `site` varchar(64) DEFAULT NULL COMMENT '留言人网站，友链备用',
 

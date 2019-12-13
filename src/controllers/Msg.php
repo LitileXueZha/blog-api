@@ -94,8 +94,10 @@ class Msg extends BaseController
         }
 
         // 可供添加的字段
-        $keys = ['name', 'content', 'avatar', 'platform', 'user_agent'];
+        $keys = ['name', 'content', 'avatar', 'platform'];
         $data = Util::filter($data, $keys);
+        // 用户代理从 header 里取
+        $data['user_agent'] = $req['headers']['USER_AGENT'];
 
         $record = MM::add($data);
         $res = new Response(HttpCode::OK, $record);

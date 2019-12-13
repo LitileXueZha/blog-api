@@ -57,3 +57,32 @@ AFTER `parent_id`;
 
 ALTER TABLE `comment`
 MODIFY COLUMN `name` varchar(20) DEFAULT NULL COMMENT '评论人姓名';
+
+-- 添加用户表，API 鉴权支持
+CREATE TABLE `user` (
+    `id` int(16) unsigned AUTO_INCREMENT,
+    `account` varchar(32) NULL COMMENT '账号，可以是英文、邮箱、手机号等等',
+    `display_name` varchar(64) NULL COMMENT '用户昵称',
+    `avatar` varchar(128) NULL COMMENT '用户头像',
+    `pwd` varchar(256) NULL COMMENT '加密后的密码',
+
+    `user_ip` char(15) NULL COMMENT '注册时 IP 地址',
+    `user_host` varchar(128) NULL COMMENT '注册时域名',
+    `user_agent` varchar(150) NULL COMMENT '注册时浏览器标识',
+
+    `user_id` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '唯一短链型 id',
+    `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `modify_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `delete_at` datetime NULL,
+    `_d` tinyint(1) DEFAULT 0 COMMENT '逻辑删除',
+
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uq_user` (`name`, `_d`),
+    KEY `idx_user` (`user_id`)
+)
+ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE utf8mb4_general_ci
+COMMENT '用户表，目前用来支撑 API 鉴权';
+
+INSERT INTO `user` (`name`, `display_name`, `user_id`) VALUES ('tao', `诸葛林`, `__ADMIN__`);

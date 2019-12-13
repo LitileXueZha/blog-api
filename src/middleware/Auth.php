@@ -179,18 +179,16 @@ class Auth implements Middleware
         $token = str_replace('Bearer ', '', $token);
         // 解析 jwt
         $arr = explode('.', $token);
-        @$header = $arr[0];
-        $payload = @$arr[1];
-        @$secret = $arr[2];
+        [$header, $payload, $secret] = array_pad($arr, 3, NULL);
 
         if (!($header && $payload && $secret)) {
             return false;
         }
 
         // 解析 header
-        $arr = json_decode(base64_decode($header));
-        @$typ = $arr['typ'];
-        @$alg = $arr['alg'];
+        $arr = json_decode(base64_decode($header), true) + ['typ' => NULL, 'alg' => NULL];
+        $typ = $arr['typ'];
+        $alg = $arr['alg'];
 
         if (!($typ && $alg)) {
             return false;
@@ -198,8 +196,7 @@ class Auth implements Middleware
 
         // 解析 payload
         $arr = explode(':', base64_decode($payload));
-        @$exp = $arr[0];
-        @$uid = $arr[1];
+        [$exp, $uid] = array_pad($arr, 2, NULL);
 
         if (!($exp && $uid)) {
             return false;
