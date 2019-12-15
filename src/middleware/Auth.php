@@ -81,12 +81,14 @@ class Auth implements Middleware
             $res = new Response(HttpCode::UNAUTHORIZED);
             $res->setErrorMsg('认证已过期');
             // 设置失效状态码
-            $res->resetResCode(901);
+            $res->resetResCode(ErrorCode::TOKEN_EXPIRED);
             $res->end();
             return;
         }
 
         // 校验通过，进入下个中间件
+        // 设置用户
+        $app::$req['AUTH_MIDDLEWARE'] = ['user' => $token['uid']];
         $next();
     }
 
@@ -107,12 +109,20 @@ class Auth implements Middleware
             'typ' => self::API_TOKEN_TYPE,
             'alg' => self::API_TOKEN_ALGORITHM,
         ];
-        $exp = time() + (self::API_EXPIRE_DAYS * 24 * 60 * 60);
+        $exp = time() + (self::API_TOKEN_EXPIRE_DAYS * 24 * 60 * 60);
         $payload = "$exp:$uid";
+        $token = self::encrypt($header, $payload)['token'];
 
-        return self::encrypt($header, $payload);
+        return $token;
     }
 
+    /**
+     * 加密 jwt
+     * 
+     * @param Array 头部
+     * @param String 内容
+     * @return Array 秘钥部分与完整 jwt
+     */
     private static function encrypt($header, $payload)
     {
         $header = base64_encode(json_encode($header));
@@ -121,7 +131,10 @@ class Auth implements Middleware
         // 有提高安全性必要的话可以再改改
         $secret = base64_encode(hash_hmac('sha256', "$header.$payload", API_SECRET, true));
 
-        return "$header.$payload.$secret";
+        return [
+            'secret' => $secret,
+            'token' => "$header.$payload.$secret",
+        ];
     }
 
     /**
@@ -142,14 +155,14 @@ class Auth implements Middleware
         $alg = $token['alg'];
 
         // 令牌类型不正确
-        if (!($typ === self::API_TOKEN_TYPE && $alg === self::API_TOKEN_ALGORITHM)) {
-            return self::TOKEN_FAIL;
-        }
+        // if (!($typ === self::API_TOKEN_TYPE && $alg === self::API_TOKEN_ALGORITHM)) {
+        //     return self::TOKEN_FAIL;
+        // }
 
         // NOTE: 有可能 payload 里的失效时间不是时间戳
         $exp = (int) $token['exp'];
         $uid = $token['uid'];
-        $secret = self::encrypt(['typ' => $typ, 'alg' => $alg], "$exp:$uid");
+        $secret = self::encrypt(['typ' => $typ, 'alg' => $alg], "$exp:$uid")['secret'];
 
         // 令牌验签失败
         if ($secret !== $token['secret']) {
@@ -173,7 +186,7 @@ class Auth implements Middleware
      * @param String $token
      * @return Array|Boolean
      */
-    private static function parse($token)
+    public static function parse($token)
     {
         // 去除头部字符
         $token = str_replace('Bearer ', '', $token);

@@ -77,7 +77,7 @@ CREATE TABLE `user` (
     `_d` tinyint(1) DEFAULT 0 COMMENT '逻辑删除',
 
     PRIMARY KEY (`id`),
-    UNIQUE KEY `uq_user` (`name`, `_d`),
+    UNIQUE KEY `uq_user` (`account`, `_d`),
     KEY `idx_user` (`user_id`)
 )
 ENGINE=InnoDB
@@ -85,4 +85,9 @@ DEFAULT CHARSET=utf8mb4
 COLLATE utf8mb4_general_ci
 COMMENT '用户表，目前用来支撑 API 鉴权';
 
-INSERT INTO `user` (`name`, `display_name`, `user_id`) VALUES ('tao', `诸葛林`, `__ADMIN__`);
+INSERT INTO `user` (`name`, `display_name`, `user_id`)
+VALUES ('tao', '诸葛林', '__ADMIN__');
+
+UPDATE `user`
+SET pwd='$2y$10$4iq1gyL6nPkm3Tbw8Lb0ie3Z5QiUVhoL509q/yVI0C9C1zcZqdDkW'
+WHERE user_id='__ADMIN__';

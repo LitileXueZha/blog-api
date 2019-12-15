@@ -15,6 +15,7 @@ require_once __DIR__.'/src/controllers/Tag.php';
 require_once __DIR__.'/src/controllers/Msg.php';
 require_once __DIR__.'/src/controllers/Comment.php';
 require_once __DIR__.'/src/controllers/Search.php';
+require_once __DIR__.'/src/controllers/Common.php';
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
@@ -58,8 +59,8 @@ $route
 
     // 其它
     ->get('/search', 'Search::list') // 搜索
-    ->post('/user/login', 'aa') // 管理用户登录
-    ->get('/oauth', 'aa') // 获取 API 访问令牌
+    ->post('/user/login', 'Common::userLogin') // 管理用户登录
+    ->get('/oauth', 'Common::oauth') // 获取 API 访问令牌
     ->get('/user/:id', 'aa')
     ->get('/example/**', 'aa');
 

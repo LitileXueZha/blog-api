@@ -119,7 +119,9 @@ class Response
         }
     }
 
-    // 返回数据
+    /**
+     * 返回数据
+     */
     public function end()
     {
         // 设置 HTTP code
