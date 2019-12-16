@@ -67,7 +67,8 @@ CREATE TABLE `user` (
     `pwd` varchar(256) NULL COMMENT '加密后的密码',
 
     `user_ip` char(15) NULL COMMENT '注册时 IP 地址',
-    `user_host` varchar(128) NULL COMMENT '注册时域名',
+    `user_ip_address` varchar(256) NULL COMMENT '注册时 IP 所在地址',
+    `user_origin` varchar(128) NULL COMMENT '注册时域名',
     `user_agent` varchar(150) NULL COMMENT '注册时浏览器标识',
 
     `user_id` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '唯一短链型 id',
@@ -85,9 +86,9 @@ DEFAULT CHARSET=utf8mb4
 COLLATE utf8mb4_general_ci
 COMMENT '用户表，目前用来支撑 API 鉴权';
 
-INSERT INTO `user` (`name`, `display_name`, `user_id`)
-VALUES ('tao', '诸葛林', '__ADMIN__');
+INSERT INTO `user` (`account`, `display_name`, `pwd`, `user_id`)
+VALUES ('tao', '诸葛林', '$2y$10$4iq1gyL6nPkm3Tbw8Lb0ie3Z5QiUVhoL509q/yVI0C9C1zcZqdDkW', '__ADMIN__');
 
-UPDATE `user`
-SET pwd='$2y$10$4iq1gyL6nPkm3Tbw8Lb0ie3Z5QiUVhoL509q/yVI0C9C1zcZqdDkW'
-WHERE user_id='__ADMIN__';
+ALTER TABLE `user`
+ADD COLUMN `user_ip_address` varchar(256) NULL COMMENT '注册时 IP 所在地址'
+AFTER `user_ip`;
