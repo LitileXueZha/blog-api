@@ -34,7 +34,7 @@ class User
         $data['user_id'] = DB::shortId();
 
         $columns = array_keys($data);
-        $dbs = new DBStatement($db);
+        $dbs = new DBStatement($tb);
 
         // dbs 操作
         $dbs->insert($columns);
@@ -49,6 +49,10 @@ class User
 
         // 执行 sql
         $sql->execute();
+
+        $res = self::get(['user_id' => $data['user_id']]);
+
+        return $res['items'][0];
     }
 
     /**
@@ -68,13 +72,30 @@ class User
 
         // dbs 查询
         $dbs->select(
-                'account, display_name, avatar, pwd',
-                'user_ip, user_ip_address, user_origin, user_agent',
-                'user_id as id, create_at'
+                'user_id as id, account, display_name, avatar, pwd',
+                // 暂不查询用户数据
+                // 'user_ip, user_ip_address, user_origin, user_agent',
+                'create_at'
             )
             ->where($columns);
         
         $statement = $dbs->toString();
         $sql = $db->prepare($statement);
+
+        // 绑定数据
+        foreach ($params as $key => $value) {
+            $sql->bindValue(":$key", $value);
+        }
+
+        $sql->execute();
+
+        $res = $sql->fetchAll();
+        $sqlCount = $db->query('SELECT FOUND_ROWS()');
+        $count = $sqlCount->fetch();
+
+        return [
+            'total' => $count['FOUND_ROWS()'],
+            'items' => $res,
+        ];
     }
 }

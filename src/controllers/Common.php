@@ -4,6 +4,10 @@
  * 一些公共请求逻辑
  */
 
+require_once __DIR__.'/../models/User.php';
+
+use TC\Model\User as MMU;
+
 class Common extends BaseController
 {
     /**
@@ -11,14 +15,10 @@ class Common extends BaseController
      */
     public static function oauth($req)
     {
-        // Log::debug($_SERVER);
         $headers = $req['headers'];
         $uid = '';
 
         if (empty($headers['AUTHORIZATION'])) {
-            // TODO: 数据库生成用户
-            $uid = '__ADMIN__';
-
             // 没有来源，默认为接口域名
             if (empty($headers['ORIGIN'])) {
                 $headers['ORIGIN'] = $_SERVER['REQUEST_SCHEME'] .'://'. $headers['HOST'];
@@ -26,13 +26,14 @@ class Common extends BaseController
 
             $ip = $_SERVER['REMOTE_ADDR'];
             $params = [
-                // TODO: ip 地理位置查询
                 'user_ip' => $ip,
                 'user_ip_address' => IPSearch::ip138($ip),
                 'user_origin' => $headers['ORIGIN'],
                 'user_agent' => $headers['USER_AGENT'],
             ];
-            Log::debug($params);
+            // 数据库生成用户
+            $res = MMU::add($params);
+            $uid = $res['id'];
         } else if ($token = Auth::parse($headers['AUTHORIZATION'])) {
             $uid = $token['uid'];
         }
@@ -48,6 +49,54 @@ class Common extends BaseController
      */
     public static function userLogin($req)
     {
-        echo 1;
+        $data = $req['data'];
+        $rules = [
+            'account' => [
+                'type' => 'string',
+                'required' => true,
+                'error' => '账号不正确',
+            ],
+            'pwd' => [
+                'type' => 'string',
+                'required' => true,
+                'error' => '密码不正确',
+            ],
+        ];
+
+        $msg = Util::validate($data, $rules);
+
+        // 规则校验失败
+        if ($msg) {
+            self::bad($msg);
+            return;
+        }
+
+        // 查询字段
+        $keys = ['account'];
+        $params = Util::filter($data, $keys);
+
+        // 筛选未删除用户
+        $params['_d'] = 0;
+        $rows = MMU::get($params);
+
+        if ($rows['total'] === 0) {
+            self::bad('账号不存在');
+            return;
+        }
+
+        $user = $rows['items'][0];
+
+        // 验证密码
+        if (!password_verify($data['pwd'], $user['pwd'])) {
+            self::bad('密码错误');
+            return;
+        }
+
+        // 删除密码返回
+        unset($user['pwd']);
+
+        $res = new Response(HttpCode::OK, $user);
+
+        $res->end();
     }
 }
