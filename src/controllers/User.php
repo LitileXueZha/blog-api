@@ -1,14 +1,14 @@
 <?php
 
 /**
- * 一些公共请求逻辑
+ * 跟用户相关的逻辑，包括特殊的 API 鉴权
  */
 
 require_once __DIR__.'/../models/User.php';
 
 use TC\Model\User as MMU;
 
-class Common extends BaseController
+class User extends BaseController
 {
     /**
      * 生成 token 接口
@@ -47,7 +47,7 @@ class Common extends BaseController
     /**
      * 管理用户登录接口
      */
-    public static function userLogin($req)
+    public static function login($req)
     {
         $data = $req['data'];
         $rules = [
@@ -95,7 +95,13 @@ class Common extends BaseController
         // 删除密码返回
         unset($user['pwd']);
 
-        $res = new Response(HttpCode::OK, $user);
+        // 生成 token
+        $tokenStr = Auth::generate($user['id']);
+
+        $res = new Response(HttpCode::OK, [
+            'token' => $tokenStr,
+            'user' => $user,
+        ]);
 
         $res->end();
     }
