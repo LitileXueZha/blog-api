@@ -61,6 +61,7 @@ $route
     ->get('/search', 'Search::list') // 搜索
     ->post('/user/login', 'User::login') // 管理用户登录
     ->get('/oauth', 'User::oauth') // 获取 API 访问令牌
+    ->get('/whoami', 'User::whoami') // 查询当前访问用户
     ->get('/user/:id', 'aa')
     ->get('/example/**', 'aa');
 

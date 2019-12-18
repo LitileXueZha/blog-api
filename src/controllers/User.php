@@ -105,4 +105,34 @@ class User extends BaseController
 
         $res->end();
     }
+
+    /**
+     * 查询当前访问用户
+     * 
+     * 原本思考将 `token` 存入前端，达到免登录，但是用户信息
+     * 却丢了，再存入用户数据有安全隐患。看了下 Github 等做法，
+     * 需要服务端支持，即 ssr。博客项目完全是前后端分离，发现
+     * MDN 做法就是提供了这样一个接口。。。
+     */
+    public static function whoami($req)
+    {
+        // 从认证的中间件数据拿
+        $userId = $req['AUTH_MIDDLEWARE']['user'];
+
+        $rows = MMU::get(['user_id' => $userId, '_d' => 0]);
+
+        // 有可能数据库没这个用户
+        if ($rows['total'] === 0) {
+            self::notFound();
+            return;
+        }
+        
+        $user = $rows['items'][0];
+
+        unset($user['pwd']);
+
+        $res = new Response(HttpCode::OK, $user);
+
+        $res->end();
+    }
 }
