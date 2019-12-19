@@ -84,7 +84,7 @@ class IPSearch
             return '专用网络';
         }
 
-        if (strpos($ip, '0.')) {
+        if (strpos($ip, '0.') === 0) {
             return '本地未知网络';
         }
     }
