@@ -66,4 +66,5 @@ $route
     ->get('/example/**', 'aa');
 
 App::use(new Auth);
+App::use(new AccessControl);
 App::use(new RouteMiddleware($route));
