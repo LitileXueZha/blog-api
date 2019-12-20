@@ -34,7 +34,7 @@ class AccessControl
      * 
      * @var Array
      */
-    private static $acl;
+    private static $acls;
 
     /**
      * 所有的路由集合正则
@@ -53,10 +53,7 @@ class AccessControl
      */
     public static function getacl($api, $uid, $privilege = NULL)
     {
-        if (!self::$acl) {
-            self::init();
-        }
-
+        $acls = self::init();
         // 使用初始化的路由集合正则定位到具体的某个 acl key
         $res = preg_match(self::$reg, $api, $matches);
 
@@ -67,14 +64,21 @@ class AccessControl
 
         // 为什么是长度 - 2？因为捕获了分组，且第一个为匹配中的所有集合
         $index = count($matches) - 2;
-        $acl = self::$acl[$index];
+        $acl = $acls[$index];
 
         // 复杂的字符串规则
         if (is_string($acl)) {
+            // 显示地指明无权限。例如 'foo:0$*:1'
+            $userForbidReg = "/$uid(\+$privilege)?\:0/";
+
+            if (preg_match($userForbidReg, $acl)) {
+                return 0;
+            }
+
             // 转化用户有权限的 acl 正则表达式。直接匹配 acl 规则，
             // 如果匹配到了，说明有权限；没有则无权限
             // 例如 'tao' => '/tao|*:1/'
-            $userAclReg = $privilege ? "/$uid|\*\+$privilege\:1/" : "/$uid|\*\:1/";
+            $userAclReg = $privilege ? "/($uid|\*)\+$privilege\:1/" : "/($uid|\*)\:1/";
             // 返回匹配次数 0/1，正好契合权限设计
             $resAcl = preg_match($userAclReg, $acl);
 
@@ -88,9 +92,15 @@ class AccessControl
      * 初始化
      * 
      * 目前是从本地写好的 `.json` 文件中读取
+     * @param String $path 加载 acl 的 `.json` 文件路径
+     * @return Array 权限列表
      */
-    private static function init($path = self::DATA_FILE)
+    public static function init($path = self::DATA_FILE)
     {
+        if (self::$acls) {
+            return self::$acls;
+        }
+
         $contents = file_get_contents($path);
         $arr = json_decode($contents, true);
         $regs = [];
@@ -106,7 +116,10 @@ class AccessControl
 
         $regex = implode('|', $regs);
 
+        // 缓存 acl
         self::$reg = "/^$regex$/";
-        self::$acl = $acls;
+        self::$acls = $acls;
+
+        return $acls;
     }
 }

@@ -5,11 +5,15 @@
         <testsuite name="单元测试（工具类）">
             <directory>tests/kits/</directory>
         </testsuite>
+        <testsuite name="单元测试（数据模型）">
+            <directory>tests/models/</directory>
+        </testsuite>
     </testsuites>
 
     <filter>
         <whitelist>
             <directory suffix=".php">src/kits/</directory>
+            <directory suffix=".php">src/models/</directory>
             <file>src/app.php</file>
             <file>src/route.php</file>
         </whitelist>
