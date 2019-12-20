@@ -30,6 +30,9 @@ $config = [
 
     // 接口加密秘钥
     'API_SECRET' => 'Mr.tao is handsome!',
+
+    // 管理员 id
+    'ADMIN' => '__ADMIN__',
 ];
 
 /**
