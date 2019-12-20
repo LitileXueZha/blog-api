@@ -84,8 +84,13 @@ class Comment extends BaseController
         }
 
         // 可添加的字段
-        $keys = ['parent_id', 'name', 'content', 'type', 'label'];
+        $keys = ['parent_id', 'name', 'content', 'type'];
         $data = Util::filter($data, $keys);
+
+        // 博主身份标识
+        if ($req['AUTH_MIDDLEWARE']['user'] === ADMIN) {
+            $data['label'] = 1;
+        }
 
         $record = MMC::add($data);
         $res = new Response(HttpCode::OK, $record);
@@ -119,7 +124,6 @@ class Comment extends BaseController
     /**
      * 更新单条评论
      * 
-     * TODO: 仅管理后台可操作
      * @param Array 请求信息
      */
     public static function update($req)
@@ -177,7 +181,6 @@ class Comment extends BaseController
     /**
      * 删除一条评论
      * 
-     * TODO: 仅管理后台可操作
      * @param Array 请求信息
      */
     public static function delete($req)

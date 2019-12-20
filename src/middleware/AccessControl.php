@@ -31,6 +31,7 @@ class AccessControl implements Middleware
             $res = new Response(HttpCode::FORBIDDEN);
 
             $res->setErrorMsg('无权限');
+            $res->end();
             return;
         }
         

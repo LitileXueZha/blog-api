@@ -4,8 +4,8 @@
 // FIXME: 找下 phpunit 自动引入方式
 require_once DIR_ROOT.'/src/models/AccessControl.php';
 
-use \TC\Model\AccessControl as ACL;
-use \PHPUnit\Framework\TestCase;
+use TC\Model\AccessControl as ACL;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @testdox 测试数据模型_AccessControl_访问控制

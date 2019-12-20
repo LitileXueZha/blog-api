@@ -13,13 +13,13 @@
     "DELETE /v1/tags/*": "__ADMIN__:1",
 
     "GET /v1/msg": 1,
-    "POST /v1/msg": "__ADMIN__:1",
+    "POST /v1/msg": 1,
     "GET /v1/msg/*": 1,
     "PUT /v1/msg/*": "__ADMIN__:1",
     "DELETE /v1/msg/*": "__ADMIN__:1",
 
     "GET /v1/comments": 1,
-    "POST /v1/comments": "__ADMIN__:1",
+    "POST /v1/comments": 1,
     "GET /v1/comments/*": 1,
     "PUT /v1/comments/*": "__ADMIN__:1",
     "DELETE /v1/comments/*": "__ADMIN__:1",

@@ -81,8 +81,17 @@ class Comment
         $columns = array_keys($params);
         $dbs = new DBStatement($tb);
 
+        $nestArticleSql = "SELECT title FROM article
+                            WHERE $tb.type=0 AND article.article_id=$tb.parent_id";
+        $nestMsgSql = "SELECT name from msg
+                            WHERE $tb.type=1 AND msg.msg_id=$tb.parent_id";
+
         // dbs 查询
-        $dbs->select('comment_id as id, parent_id, name, content, type, label, create_at')
+        $dbs->select(
+                'comment_id as id, parent_id, name, content, type, label, create_at',
+                "($nestArticleSql) as parent_title",
+                "($nestMsgSql) as parent_name"
+            )
             ->where($columns)
             ->orderBy($orderBy)
             ->limit($limit);
@@ -99,6 +108,17 @@ class Comment
         $res = $sql->fetchAll();
         $sqlCount = $db->query("SELECT FOUND_ROWS()");
         $count = $sqlCount->fetch();
+
+        // 处理嵌套 parent
+        foreach ($res as &$row) {
+            // 对应主体需要的字段
+            $col = $row['type'] ? 'name' : 'title';
+            // 设置主体
+            $row['parent']['id'] = $row['parent_id'];
+            $row['parent'][$col] = $row["parent_$col"];
+            // 清除其它数据
+            unset($row['parent_title'], $row['parent_name']);
+        }
 
         return [
             'total' => $count['FOUND_ROWS()'],
