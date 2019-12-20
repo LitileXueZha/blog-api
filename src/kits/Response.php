@@ -20,7 +20,7 @@ class Response
     private $headers = [
         'Content-Type: application/json',
         // 跨域
-        'Access-Control-Allow-Origin: '. ENV === 'production' ? CORS : '*',
+        'Access-Control-Allow-Origin: '. (DEBUG ? '*' : CORS),
         'Access-Control-Allow-Methods: OPTIONS,HEAD,GET,POST,PUT,DELETE',
         'Access-Control-Allow-Headers: Authorization,Content-Type',
     ];
