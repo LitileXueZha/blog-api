@@ -61,6 +61,7 @@ CREATE TABLE `msg` (
 
     `msg_id` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '唯一短链型 id',
     `create_at` datetime DEFAULT CURRENT_TIMESTAMP,
+    `create_by` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '用户 id',
     `modify_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     `delete_at` datetime NULL,
     `_d` tinyint(1) DEFAULT 0 COMMENT '逻辑删除',

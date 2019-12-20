@@ -92,3 +92,8 @@ VALUES ('tao', '诸葛林', '$2y$10$4iq1gyL6nPkm3Tbw8Lb0ie3Z5QiUVhoL509q/yVI0C9C
 ALTER TABLE `user`
 ADD COLUMN `user_ip_address` varchar(256) NULL COMMENT '注册时 IP 所在地址'
 AFTER `user_ip`;
+
+-- 添加留言者
+ALTER TABLE `msg`
+ADD COLUMN `create_by` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '用户 id'
+AFTER `create_at`;

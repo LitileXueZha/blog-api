@@ -92,38 +92,6 @@ class DB
     }
 
     /**
-     * 占位字符转化
-     * 
-     * 根据 key 数组转化成 prepare 语句里的占位字符串
-     * 
-     * @example ['name', 'age'] 转化为 ['name,age', ':name,:age']
-     * 
-     * @param Array $keys key 数组
-     * @return Array
-     */
-    public static function getPlaceholderByKeys($keys)
-    {
-        $column = implode(',', $keys);
-        $placeholder = implode(',', array_map(function ($col) {
-            return ":$col";
-        }, $keys));
-
-        return [$column, $placeholder];
-    }
-
-    /**
-     * 查询条件转化
-     * 
-     * 根据定义的几个字段转化成
-     * 
-     * @see https://dev.mysql.com/doc/refman/8.0/en/select.html
-     */
-    public static function getQueryStr($options)
-    {
-        // TODO: xxx
-    }
-
-    /**
      * 读取配置，如果没有返回默认
      * 
      * @param Array $options 配置项

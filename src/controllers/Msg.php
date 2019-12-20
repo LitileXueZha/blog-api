@@ -98,6 +98,8 @@ class Msg extends BaseController
         $data = Util::filter($data, $keys);
         // 用户代理从 header 里取
         $data['user_agent'] = $req['headers']['USER_AGENT'];
+        // 留言者
+        $data['create_by'] = $req['AUTH_MIDDLEWARE']['user'];
 
         $record = MM::add($data);
         $res = new Response(HttpCode::OK, $record);
