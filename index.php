@@ -21,11 +21,6 @@ require_once __DIR__.'/src/controllers/User.php';
 // 如果之后新开接口，和现有冲突，换个版本号就行
 $route = new Route('/v1');
 
-function aa($req) {
-    $res = new Response(HttpCode::OK, $req);
-    $res->end();
-}
-
 $route
     // 文章模块
     ->get('/articles', 'Article::list') // 获取文章列表
@@ -62,8 +57,7 @@ $route
     ->post('/user/login', 'User::login') // 管理用户登录
     ->get('/oauth', 'User::oauth') // 获取 API 访问令牌
     ->get('/whoami', 'User::whoami') // 查询当前访问用户
-    ->get('/user/:id', 'aa')
-    ->get('/example/**', 'aa');
+    ;
 
 App::use(new Auth);
 App::use(new AccessControl);
