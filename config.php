@@ -18,7 +18,7 @@ $config = [
     // NOTE: 线上必须设置为 false！！！
     'DEBUG' => false,
 
-    'CORS' => 'https://wwww.ningtaostudy.cn',
+    'CORS' => 'https://www.ningtaostudy.cn',
 
     'DB_HOST' => 'localhost',
     'DB_PORT' => 3306,
