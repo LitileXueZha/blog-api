@@ -31,6 +31,7 @@ class Article extends BaseController
         // 去除 `content` 字段，列表不返回文章具体内容
         foreach ($rows['items'] as &$item) {
             unset($item['content']);
+            unset($item['text_content']);
         }
 
         $res = new Response(HttpCode::OK, $rows);

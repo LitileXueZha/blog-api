@@ -92,7 +92,7 @@ class Article
         $dbs->select(
                 "$tb.article_id as id, $tb.title, $tb.summary, $tb.content, $tb.tag",
                 "$tbJoin.display_name as tag_name",
-                "$tb.status, $tb.category, $tb.bg, $tb.create_at"
+                "$tb.text_content, $tb.status, $tb.category, $tb.bg, $tb.create_at"
             )
             ->on("$tb.tag", "$tbJoin.name")
             ->where($columns)

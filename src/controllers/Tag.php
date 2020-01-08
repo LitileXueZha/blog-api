@@ -182,4 +182,16 @@ class Tag extends BaseController
 
         $res->end();
     }
+
+    public static function click($req)
+    {
+        $res = new Response(HttpCode::NO_CONTENT);
+
+        if (isset($req['data']['id'])) {
+            // 有效标签 id 统计
+            MMT::incrClick($req['data']['id']);
+        }
+
+        $res->end();
+    }
 }

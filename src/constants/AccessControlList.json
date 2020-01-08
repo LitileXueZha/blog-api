@@ -11,6 +11,7 @@
     "POST /v1/tags": "__ADMIN__:1",
     "PUT /v1/tags/*": "__ADMIN__:1",
     "DELETE /v1/tags/*": "__ADMIN__:1",
+    "HEAD /v1/tags/click": 1,
 
     "GET /v1/msg/*": 1,
     "GET /v1/msg": 1,
@@ -24,6 +25,8 @@
     "POST /v1/comments": 1,
     "PUT /v1/comments/*": "__ADMIN__:1",
     "DELETE /v1/comments/*": "__ADMIN__:1",
+
+    "GET /v1/seo/index": 1,
 
     "GET /v1/search": 1,
     "GET /v1/oauth": 1,

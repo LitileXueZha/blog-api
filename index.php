@@ -16,6 +16,7 @@ require_once __DIR__.'/src/controllers/Msg.php';
 require_once __DIR__.'/src/controllers/Comment.php';
 require_once __DIR__.'/src/controllers/Search.php';
 require_once __DIR__.'/src/controllers/User.php';
+require_once __DIR__.'/src/controllers/Util.php';
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
@@ -29,6 +30,7 @@ $route
     ->put('/articles/:id', 'Article::update') // 更新单篇文章
     ->delete('/articles/:id', 'Article::delete') // 删除单篇文章
     ->get('/articles/trash', 'Article::getTrashList') // 文章垃圾箱
+    ->post('/articles/action', 'Article::action') // 文章操作：点赞、踩
 
     // 标签模块
     ->get('/tags', 'Tag::list') // 列表
@@ -36,6 +38,7 @@ $route
     ->get('/tags/:id', 'Tag::read') // 获取单个标签
     ->put('/tags/:id', 'Tag::update') // 更新单个标签
     ->delete('/tags/:id', 'Tag::delete') // 删除标签
+    ->head('/tags/click', 'Tag::click') // 标签点击量统计
 
     // 留言模块
     ->get('/msg', 'Msg::list') // 列表
@@ -51,6 +54,9 @@ $route
     ->put('/comments/:id', 'Comment::update') // 更新单条评论
     ->delete('/comments/:id', 'Comment::delete') // 删除单条评论
     ->get('/comments/all', 'Comment::verbose') // 管理后台获取全部评论数据
+
+    // 通用，多模块结合
+    ->get('/seo/index', 'UtilController::getIndexData') // 获取首页数据
 
     // 其它
     ->get('/search', 'Search::list') // 搜索

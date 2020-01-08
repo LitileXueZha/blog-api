@@ -154,4 +154,20 @@ class Tag
 
         return $count;
     }
+
+    /**
+     * 标签点击数 +1
+     * 
+     * @param String 标签 id
+     */
+    public static function incrClick($id)
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+        // 转义
+        $id = $db->quote($id);
+        $statement = "UPDATE $tb SET click=click+1 WHERE `name`=$id";
+
+        $db->exec($statement);
+    }
 }
