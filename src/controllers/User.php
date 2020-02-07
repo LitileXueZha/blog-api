@@ -27,7 +27,7 @@ class User extends BaseController
             $ip = $_SERVER['REMOTE_ADDR'];
             $params = [
                 'user_ip' => $ip,
-                'user_ip_address' => IPSearch::ip138($ip),
+                'user_ip_address' => IPSearch::chinaz($ip),
                 'user_origin' => $headers['ORIGIN'],
                 'user_agent' => $headers['USER_AGENT'],
             ];

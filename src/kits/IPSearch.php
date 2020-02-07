@@ -19,6 +19,8 @@ class IPSearch
     /**
      * ip138 站点提供的数据
      * 
+     * 此站点已挂，估计是把我服务器 ip 封了。弃用之
+     * 
      * @param String $ip
      * @return String 中文地理位置
      */
@@ -87,5 +89,9 @@ class IPSearch
         if (strpos($ip, '0.') === 0) {
             return '本地未知网络';
         }
+
+        // 伪装成浏览器
+        // 目前只想到 userAgent，可能还有其它判断方式
+        ini_set('user_agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.87 Safari/537.36');
     }
 }
