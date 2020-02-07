@@ -17,8 +17,8 @@ class User extends BaseController
     {
         $headers = $req['headers'];
         $uid = '';
-
-        if (empty($headers['AUTHORIZATION'])) {
+        // 数据库创建用户
+        $createUser = function () use ($headers) {
             // 没有来源，默认为接口域名
             if (empty($headers['ORIGIN'])) {
                 $headers['ORIGIN'] = $_SERVER['REQUEST_SCHEME'] .'://'. $headers['HOST'];
@@ -33,9 +33,17 @@ class User extends BaseController
             ];
             // 数据库生成用户
             $res = MMU::add($params);
-            $uid = $res['id'];
+
+            return $res['id'];
+        };
+
+        if (empty($headers['AUTHORIZATION'])) {
+            $uid = $createUser();
         } else if ($token = Auth::parse($headers['AUTHORIZATION'])) {
             $uid = $token['uid'];
+        } else {
+            // 前端传了 token，但是解析有问题。还是要创建用户
+            $uid = $createUser();
         }
 
         $tokenStr = Auth::generate($uid);

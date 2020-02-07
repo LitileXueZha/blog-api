@@ -162,12 +162,13 @@ class Auth implements Middleware
         // NOTE: 有可能 payload 里的失效时间不是时间戳
         $exp = (int) $token['exp'];
         $uid = $token['uid'];
-        $secret = self::encrypt(['typ' => $typ, 'alg' => $alg], "$exp:$uid")['secret'];
+        // $secret = self::encrypt(['typ' => $typ, 'alg' => $alg], "$exp:$uid")['secret'];
 
-        // 令牌验签失败
-        if ($secret !== $token['secret']) {
-            return self::TOKEN_FAIL;
-        }
+        // // 令牌验签失败
+        // 这一步放到了解析里面，提交安全性
+        // if ($secret !== $token['secret']) {
+        //     return self::TOKEN_FAIL;
+        // }
 
         // 令牌失效
         if (time() > $exp) {
@@ -212,6 +213,13 @@ class Auth implements Middleware
         [$exp, $uid] = array_pad($arr, 2, NULL);
 
         if (!($exp && $uid)) {
+            return false;
+        }
+
+        $realToken = self::encrypt(['typ' => $typ, 'alg' => $alg], "$exp:$uid")['secret'];
+        
+        // 加入安全性验证。否则解析失败
+        if ($secret !== $realToken) {
             return false;
         }
 
