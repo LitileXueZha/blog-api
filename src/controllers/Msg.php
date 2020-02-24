@@ -77,12 +77,12 @@ class Msg extends BaseController
                 'required' => true,
                 'error' => '留言内容不能为空',
             ],
-            'platform' => [
-                'type' => 'enum',
-                'required' => true,
-                'enum' => ['pc', 'mobile'],
-                'error' => '留言平台需为pc或mobile',
-            ],
+            // 'platform' => [
+            //     'type' => 'enum',
+            //     'required' => true,
+            //     'enum' => ['pc', 'mobile'],
+            //     'error' => '留言平台需为pc或mobile',
+            // ],
         ];
 
         $msg = Util::validate($data, $rules);
@@ -94,10 +94,10 @@ class Msg extends BaseController
         }
 
         // 可供添加的字段
-        $keys = ['name', 'content', 'avatar', 'platform'];
+        $keys = ['name', 'content', 'avatar'];
         $data = Util::filter($data, $keys);
-        // 用户代理从 header 里取
-        $data['user_agent'] = $req['headers']['USER_AGENT'];
+        // // 用户代理从 header 里取
+        // $data['user_agent'] = $req['headers']['USER_AGENT'];
         // 留言者
         $data['create_by'] = $req['AUTH_MIDDLEWARE']['user'];
 

@@ -78,8 +78,8 @@ class Msg
 
         // dbs 查询
         $dbs->select(
-                'msg_id as id, name, content, avatar, platform',
-                'user_agent, `read`, site, create_at'
+                'msg_id as id, name, content, avatar',
+                '`read`, site, create_at, create_by'
             )
             ->where($columns)
             ->orderBy($orderBy)
