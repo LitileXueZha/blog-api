@@ -7,7 +7,7 @@
     "DELETE /v1/articles/*": "__ADMIN__:1",
 
     "GET /v1/tags/*": 1,
-    "GET /v1/tags": 1,
+    "GET /v1/tags": "*:1$__ADMIN__+readAll:1",
     "POST /v1/tags": "__ADMIN__:1",
     "PUT /v1/tags/*": "__ADMIN__:1",
     "DELETE /v1/tags/*": "__ADMIN__:1",

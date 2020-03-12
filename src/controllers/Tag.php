@@ -5,11 +5,18 @@
  */
 
 require_once __DIR__.'/../models/Tag.php';
+require_once __DIR__.'/../models/Tag.php';
 
 use TC\Model\Tag as MMT;
+use TC\Model\AccessControl as ACL;
 
 class Tag extends BaseController
 {
+    /** 可用 */
+    const AVAILABLE = 1;
+    /** 不可用。不展示给用户 */
+    const DISABLE = 2;
+
     /**
      * 获取一系列标签
      * 
@@ -21,6 +28,14 @@ class Tag extends BaseController
         // 可供查询的字段
         $keys = ['status'];
         $params = Util::filter($params, $keys);
+
+        $uid = $req['AUTH_MIDDLEWARE']['user'];
+        $aclName = $req['ACL_MIDDLEWARE']['name'];
+
+        // 无读取全部标签权限，筛选之
+        if (!ACL::getacl($aclName, $uid, 'readAll')) {
+            $params['status'] = self::AVAILABLE;
+        }
 
         // 筛选未删除
         $params['_d'] = 0;

@@ -34,6 +34,9 @@ class AccessControl implements Middleware
             $res->end();
             return;
         }
+
+        // 设置权限名称
+        $app::$req['ACL_MIDDLEWARE']['name'] = $api;
         
         /**
          * 两种情况跳过：
