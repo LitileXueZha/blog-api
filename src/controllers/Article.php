@@ -5,11 +5,22 @@
  */
 
 require_once __DIR__.'/../models/Article.php';
+require_once __DIR__.'/../models/AccessControl.php';
 
 use TC\Model\Article as MMA;
+use TC\Model\AccessControl as ACL;
 
 class Article extends BaseController
 {
+    /** 草稿 */
+    const DRAFT = 0;
+    /** 上线 */
+    const ONLINE = 1;
+    /** 下线 */
+    const OFFLINE = 2;
+    /** 垃圾箱 */
+    const TRASH = 3;
+
     /**
      * 获取一系列的文章
      * 
@@ -22,8 +33,16 @@ class Article extends BaseController
 
         // 可供查询的字段
         $selectableKeys = ['tag', 'status', 'category'];
-        $params = Util::filter($params, $selectableKeys);        
+        $params = Util::filter($params, $selectableKeys);
         
+        $uid = $req['AUTH_MIDDLEWARE']['user'];
+        $aclName = $req['ACL_MIDDLEWARE']['name'];
+
+        // 无读取全部文章权限，筛选之
+        if (!ACL::getacl($aclName, $uid, 'readAll')) {
+            $params['status'] = self::ONLINE;
+        }
+
         // 筛选未删除字段
         $params['_d'] = 0;
         $rows = MMA::get($params, ['limit' => $limit]);
@@ -61,7 +80,7 @@ class Article extends BaseController
             ],
             'status' => [
                 'type' => 'enum',
-                'enum' => [1],
+                'enum' => [self::ONLINE],
                 'error' => '文章状态需为上线',
             ],
         ];
@@ -200,7 +219,7 @@ class Article extends BaseController
         
         // 不支持其它字段筛选
         $params = [
-            'status' => 3,
+            'status' => self::TRASH,
             // 筛选未删除字段
             '_d' => 0,
         ];
