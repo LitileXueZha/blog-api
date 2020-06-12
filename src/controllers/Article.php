@@ -49,6 +49,15 @@ class Article extends BaseController
 
         // 去除 `content` 字段，列表不返回文章具体内容
         foreach ($rows['items'] as &$item) {
+            // 非管理员，`summay` 为空时截取部分内容
+            if (
+                $uid !== ADMIN
+                && empty($item['summary'])
+                && !empty($item['text_content'])
+            ) {
+                $item['summary'] = mb_substr($item['text_content'], 0, 160);
+            }
+
             unset($item['content']);
             unset($item['text_content']);
         }
