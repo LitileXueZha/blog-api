@@ -205,7 +205,7 @@ class Article
         // dbs 查询
         // 只需要查询文本搜索的几个字段，并添加一列 type 固定值为 article
         $dbs->select("article_id as id, title, summary, text_content, 'article' as type, create_at")
-            ->where(['__WHERE__' => "_d=0 AND match(title, summary, text_content) against($q)"])
+            ->where(['__WHERE__' => "status = 1 AND _d=0 AND match(title, summary, text_content) against($q)"])
             ->limit($limit);
 
         // 默认 IN NATURAL LANGUAGE MODE

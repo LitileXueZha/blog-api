@@ -56,7 +56,7 @@ class Search extends BaseController
             }
 
             // 拼接 url，目前只有 文章
-            $row['url'] = '/articles/detail?id='. $row['id'];
+            $row['url'] = '/articles/'. $row['id'];
             // 数据转化
             $row['summary'] = $result ?: $row['summary'] ?: $row['text_content'];
             unset($row['text_content']);
