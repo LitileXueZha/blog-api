@@ -46,9 +46,13 @@ class SSR extends BaseController {
             // 减小体积
             unset($row['text_content']);
             $data = json_encode($row, JSON_UNESCAPED_UNICODE);
-            $script = "<script>__SSR_DATA__=$data;</script>";
+
             // 隐藏内容
-            $html = "$script<p style='white-space:pre;width:770px;height:300px;position:absolute;left:-100%;overflow:scroll;'>$textContent</p>";
+            $html = "<div style='white-space:pre;width:770px;height:300px;position:absolute;left:-100%;overflow:scroll;'>"
+                ."<h1>{$row['title']}</h1>"
+                ."<p>$textContent</p>"
+                ."<script>__SSR_DATA__=$data;</script>"
+                ."</div>";
             
             // TODO: 简单地注入
             // 这只能说是服务端注入，而不是服务端渲染。
