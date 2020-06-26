@@ -17,6 +17,7 @@ require_once __DIR__.'/src/controllers/Comment.php';
 require_once __DIR__.'/src/controllers/Search.php';
 require_once __DIR__.'/src/controllers/User.php';
 require_once __DIR__.'/src/controllers/Util.php';
+require_once __DIR__.'/src/controllers/SSR.php';
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
@@ -65,6 +66,10 @@ $route
     ->get('/whoami', 'User::whoami') // 查询当前访问用户
     ;
 
+// 服务端渲染专用
+$ssrRoute = new Route();
+$ssrRoute->get('/articles/:id', 'SSR::renderArticle');
+
 App::use(new Auth);
 App::use(new AccessControl);
-App::use(new RouteMiddleware($route));
+App::use(new RouteMiddleware($route, $ssrRoute));

@@ -50,6 +50,13 @@ class Auth implements Middleware
             return;
         }
 
+        // 指明服务端渲染的路由跳过
+        // 需要 nginx 支持，传递一个请求头 x-private-ssr
+        if (isset($_SERVER['X_PRIVATE_SSR'])) {
+            $next();
+            return;
+        }
+
         // 2. 生成令牌的接口绕过鉴权
         if (in_array($url, self::API_OMIT)) {
             $next();

@@ -33,6 +33,9 @@ $config = [
 
     // 管理员 id
     'ADMIN' => '__ADMIN__',
+
+    // 服务端渲染模板来源
+    'SSR_SOURCE' => 'C:/Users/tao/Desktop/Workspace/blog/dist',
 ];
 
 /**
