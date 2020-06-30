@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AccessControlTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         // 测试用的 acl 权限列表
         $file = __DIR__.'/AccessControl.json';

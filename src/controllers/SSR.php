@@ -59,6 +59,8 @@ class SSR extends BaseController {
             // 主要是执行环境的问题，php 下输出的 html 可能和 js 渲染不一致，
             // 目前还是简单地附加内容到 html 里，专为 seo。另外再注入数据
             $rawFile = str_replace("<!-- %ssr_inject% -->", $html, $rawFile);
+            // 添加文档标题
+            $rawFile = preg_replace('/<title>.*?<\/title>/', "<title>{$row['title']}_滔's 博客</title>", $rawFile);
         }
 
         echo $rawFile;
