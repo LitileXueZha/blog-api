@@ -82,6 +82,8 @@ class Search extends BaseController
      */
     protected static function participle($input)
     {
+        // 转义正则
+        $input = preg_quote($input, '/');
         // 匹配前后20个字符
         $key = '[\s\S]{0,20}';
         // 空格作为分词符

@@ -91,6 +91,8 @@ class ErrorHandler
     {
         // 启用调试时，直接将数据输出到浏览器
         if (DEBUG) {
+            // 可能错误信息编码是 gbk，转一下。应该只有中文环境存在了
+            $err['msg'] = iconv('gbk', 'utf-8', $err['msg']);
             Log::debug([
                 self::$types[$code] => $err['msg'],
                 'file' => $err['file'],

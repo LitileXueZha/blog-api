@@ -45,7 +45,7 @@ class DB
         $host = DB_HOST;
         $port = DB_PORT;
         $dbname = DB_NAME;
-        $dsn = "mysql:host=$host;port=$port;dbname=$dbname";
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8mb4";
         $db = new PDO($dsn, DB_USER, DB_PASSWORD);
 
         // 设置错误捕获
