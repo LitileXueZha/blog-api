@@ -42,7 +42,7 @@ class UtilController extends BaseController
             if ($index < 3) {
                 // 文章摘要为空时，返回部分文章内容
                 if (empty($article['summary']) && !empty($article['text_content'])) {
-                    $article['summary'] = mb_substr($article['text_content'], 0, 160);
+                    $article['summary'] = mb_substr($article['text_content'], 0, 160) ."...";
                 }
 
                 // 除去文章正文

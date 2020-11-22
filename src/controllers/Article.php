@@ -55,7 +55,7 @@ class Article extends BaseController
                 && empty($item['summary'])
                 && !empty($item['text_content'])
             ) {
-                $item['summary'] = mb_substr($item['text_content'], 0, 160);
+                $item['summary'] = mb_substr($item['text_content'], 0, 160) ."...";
             }
 
             unset($item['content']);

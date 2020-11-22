@@ -30,19 +30,22 @@ class IPSearch
             return $res;
         }
 
-        $url = "http://www.ip138.com/iplookup.asp?ip=$ip";
+        $url = "http://www.ip138.com/iplookup.asp?ip=$ip&action=2";
         $content = file_get_contents($url);
         // 直接使用会导致乱码，先转一遍
         $content = iconv('gb2312', 'utf-8//IGNORE', $content);
 
-        preg_match('/<li>本站数据：(.+?)<\/li>/m', $content, $res);
+        // preg_match('/<li>本站数据：(.+?)<\/li>/m', $content, $res);
+        preg_match('/var ip_result = (\{.+?\});/m', $content, $res);
 
         if (empty($res[1])) {
             // TODO: 查询异常日志记录 warn
-            $res[1] = NULL;
+            return NULL;
         }
 
-        return $res[1];
+        $info = json_decode($res[1], true, JSON_UNESCAPED_UNICODE);
+
+        return $info['ASN归属地'];
     }
 
     /**
