@@ -25,7 +25,8 @@ class UtilController extends BaseController
      */
     public static function getIndexData($req)
     {
-        $articles = MMA::get(['status' => 1, '_d' => 0])['items'];
+        $opts = ['orderBy' => 'publish_at DESC, create_at DESC'];
+        $articles = MMA::get(['status' => 1, '_d' => 0], $opts)['items'];
         $tags = MMT::get(['status' => 1, '_d' => 0])['items'];
 
         $resolveArticles = [];

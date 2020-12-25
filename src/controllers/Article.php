@@ -43,9 +43,14 @@ class Article extends BaseController
             $params['status'] = self::ONLINE;
         }
 
+        // 管理端排序按照更新时间，用户端使用发布时间
+        $orderBy = $uid === ADMIN
+            ? 'modify_at DESC, create_at DESC'
+            : 'publish_at DESC, create_at DESC';
+
         // 筛选未删除字段
         $params['_d'] = 0;
-        $rows = MMA::get($params, ['limit' => $limit]);
+        $rows = MMA::get($params, ['limit' => $limit, 'orderBy' => $orderBy]);
 
         // 去除 `content` 字段，列表不返回文章具体内容
         foreach ($rows['items'] as &$item) {
@@ -179,6 +184,13 @@ class Article extends BaseController
         if (empty($data)) {
             self::bad('没有可更新的数据');
             return;
+        }
+
+        // 发布上线时，添加发布时间
+        $params = ['article_id' => $id, 'status' => 0, '_d' => 0];
+        $oldRows = MMA::get($params)['items'];
+        if (count($oldRows) > 0) {
+            $data['publish_at'] = date('Y-m-d H:i:s');
         }
 
         $rows = MMA::set($id, $data);

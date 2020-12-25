@@ -41,18 +41,15 @@ class Log
         $line = $log['line'];
         $traceStr = $log['trace_str'];
 
-        // 与生成的 traceString 保持一致
-        if (is_null($traceStr)) {
-            $traceStr = "#0 $file($line)";
-        }
-
         $logger = new Logger("$channel.$type");
         $handler = new StreamHandler(self::$files[$type]);
-        $formatter = new LineFormatter("[%datetime%] %channel%: %message%\n", "Y-m-d H:i:s");
+        $formatter = new LineFormatter("[%datetime%] %channel%: %message%\n", "Y-m-d H:i:s", true);
+        // 加个 tab 缩进优化展示
+        $formatTrace = "\n\t". str_replace("\n", "\n\t", $traceStr);
 
         $handler->setFormatter($formatter);
         $logger->pushHandler($handler);
-        $logger->info("$msg. $traceStr");
+        $logger->info($msg.$formatTrace);
     }
 
     /**

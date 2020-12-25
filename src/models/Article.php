@@ -92,7 +92,8 @@ class Article
         $dbs->select(
                 "$tb.article_id as id, $tb.title, $tb.summary, $tb.content, $tb.tag",
                 "$tbJoin.display_name as tag_name",
-                "$tb.text_content, $tb.status, $tb.category, $tb.bg, $tb.create_at"
+                "$tb.text_content, $tb.status, $tb.category, $tb.bg",
+                "$tb.publish_at, $tb.create_at"
             )
             ->on("$tb.tag", "$tbJoin.name")
             ->where($columns)
@@ -204,7 +205,10 @@ class Article
 
         // dbs 查询
         // 只需要查询文本搜索的几个字段，并添加一列 type 固定值为 article
-        $dbs->select("article_id as id, title, summary, text_content, 'article' as type, create_at")
+        $dbs->select(
+                "article_id as id, title, summary, text_content",
+                "'article' as type, publish_at, create_at"
+            )
             ->where(['__WHERE__' => "status = 1 AND _d=0 AND match(title, summary, text_content) against($q)"])
             ->limit($limit);
 
@@ -264,5 +268,53 @@ class Article
             'total' => $count['FOUND_ROWS()'],
             'items' => $res,
         ];
+    }
+
+    /**
+     * 获取前后相邻 2 条已上线记录
+     * 
+     * @param string 当前文章 id
+     * @param string 排序字段。默认为 'id'
+     * @return Array 文章数据。格式为 [ previous, next ]，可能为 null
+     */
+    public static function getSiblings($id, $orderCol = 'id')
+    {
+        $db = DB::init();
+        $tb = self::NAME;
+
+        $with = "WITH
+            cte_a AS (
+                SELECT id, article_id, title, publish_at, create_at
+                FROM $tb
+                WHERE `status`=1 AND `_d`=0
+            ),
+            cte_r AS (SELECT $orderCol FROM $tb WHERE `article_id`=:id)";
+        $prev = "SELECT article_id AS id, title
+            FROM cte_a
+            WHERE $orderCol < (SELECT $orderCol FROM cte_r)
+            ORDER BY $orderCol DESC, create_at DESC
+            LIMIT 1";
+        $current = "SELECT NULL AS id, NULL AS title";
+        $next = "SELECT article_id AS id, title
+            FROM cte_a
+            WHERE $orderCol > (SELECT $orderCol FROM cte_r)
+            LIMIT 1";
+        $statement = "$with ($prev) UNION ($current) UNION ($next)";
+        $sql = $db->prepare($statement);
+
+        $sql->bindValue(':id', $id);
+        $sql->execute();
+
+        $res = $sql->fetchAll();
+
+        if (count($res) > 2) {
+            $prevRow = $res[0];
+            $nextRow = $res[2];
+        } else {
+            $prevRow = is_null($res[0]['id']) ? null : $res[0];
+            $nextRow = is_null($res[1]['id']) ? null : $res[1];
+        }
+
+        return [$prevRow, $nextRow];
     }
 }

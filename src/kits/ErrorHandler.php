@@ -45,10 +45,10 @@ class ErrorHandler
             ];
 
             // 保证错误格式一致。额外的操作
-            $err['trace'] = null;
-            $err['trace_str'] = null;
+            $err['trace'] = debug_backtrace();
+            $err['trace_str'] = "at $errfile($errline)";
 
-            self::execute($err, self::ERROR);
+            self::handle($err, self::ERROR);
         });
     }
 
@@ -65,16 +65,21 @@ class ErrorHandler
          * @static Exception::getTraceAsString 异常堆栈字符串，每一条信息记录调用详情
          */
         set_exception_handler(function ($e) {
+            $file = $e->getFile();
+            $line = $e->getLine();
+            $traceStr = $e->getTraceAsString();
+            // 部分获取的 trace 中少了错误本身。手动加上
+            $errSelf = "at $file($line)\n";
             $err = [
                 'code' => $e->getCode(),
                 'msg' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
+                'file' => $file,
+                'line' => $line,
                 'trace' => $e->getTrace(),
-                'trace_str' => $e->getTraceAsString(),
+                'trace_str' => $errSelf.$traceStr,
             ];
 
-            self::execute($err, self::EXCEPTION);
+            self::handle($err, self::EXCEPTION);
         });
     }
 
@@ -87,12 +92,17 @@ class ErrorHandler
      * @return void
      */
 
-    public static function execute($err, $code)
+    private static function handle($err, $code)
     {
         // 启用调试时，直接将数据输出到浏览器
         if (DEBUG) {
             // 可能错误信息编码是 gbk，转一下。应该只有中文环境存在了
-            $err['msg'] = iconv('gbk', 'utf-8', $err['msg']);
+            // $err['msg'] = iconv('gbk', 'utf-8', $err['msg']);
+            // 上面的转法正常 utf-8 报错
+            // 设置检测顺序，范围要从小到大！！！
+            mb_detect_order('ASCII,UTF-8,GBK');
+            $encoding = mb_detect_encoding($err['msg']);
+            $err['msg'] = mb_convert_encoding($err['msg'], 'utf-8', $encoding);
             Log::debug([
                 self::$types[$code] => $err['msg'],
                 'file' => $err['file'],

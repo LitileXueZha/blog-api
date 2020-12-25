@@ -97,3 +97,12 @@ AFTER `user_ip`;
 ALTER TABLE `msg`
 ADD COLUMN `create_by` varchar(10) NOT NULL COLLATE utf8mb4_bin COMMENT '用户 id'
 AFTER `create_at`;
+
+-- 添加发布时间
+ALTER TABLE `article`
+ADD COLUMN `publish_at` datetime NULL COMMENT '发布时间'
+AFTER `modify_at`;
+-- 处理线上数据
+UPDATE `article`
+SET `publish_at` = DATE_ADD(`create_at`, INTERVAL 1 HOUR)
+WHERE status > 0;
