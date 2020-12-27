@@ -10,20 +10,33 @@ require_once __DIR__.'/vendor/autoload.php';
 require_once __DIR__.'/config.php';
 
 require_once __DIR__.'/src/app.php';
-require_once __DIR__.'/src/controllers/Article.php';
-require_once __DIR__.'/src/controllers/Tag.php';
-require_once __DIR__.'/src/controllers/Msg.php';
-require_once __DIR__.'/src/controllers/Comment.php';
-require_once __DIR__.'/src/controllers/Search.php';
-require_once __DIR__.'/src/controllers/User.php';
-require_once __DIR__.'/src/controllers/Util.php';
-require_once __DIR__.'/src/controllers/SSR.php';
+// require_once __DIR__.'/src/controllers/Article.php';
+// require_once __DIR__.'/src/controllers/Tag.php';
+// require_once __DIR__.'/src/controllers/Msg.php';
+// require_once __DIR__.'/src/controllers/Comment.php';
+// require_once __DIR__.'/src/controllers/Search.php';
+// require_once __DIR__.'/src/controllers/User.php';
+// require_once __DIR__.'/src/controllers/Util.php';
+// require_once __DIR__.'/src/controllers/SSR.php';
+Route::useController(function ($controller) {
+    return function (...$args) use ($controller) {
+        // 为字符型的类静态方法引入文件
+        if (is_string($controller) && preg_match('/^(\w+)::/', $controller, $matches)) {
+            require_once __DIR__. "/src/controllers/$matches[1].php";
+        }
+
+        $controller(...$args);
+    };
+});
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
 $route = new Route('/v1');
 
 $route
+    ->get('/', function ($req){
+        // @example 函数控制器
+    })
     // 文章模块
     ->get('/articles', 'Article::list') // 获取文章列表
     ->post('/articles', 'Article::create') // 创建文章

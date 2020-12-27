@@ -36,8 +36,10 @@ class Route
      * @var String
      */
     private $prefix = '/';
-    // 路由配置
+    /** 路由配置 */
     public $stack = [];
+    /** 包裹路由 controller 的 IoC 容器 */
+    private static $wrapControllerFn;
 
     /**
      * 初始化
@@ -78,6 +80,12 @@ class Route
             }
 
             $stack = &$stack[$str];
+        }
+
+        // 将此处控制逻辑交由外部控制
+        if (self::$wrapControllerFn) {
+            $ioc = self::$wrapControllerFn;
+            $controller = $ioc($controller);
         }
 
         $stack['methods'][$method]['controller'] = $controller;
@@ -171,5 +179,33 @@ class Route
         $this->register($url, 'DELETE', $controller);
 
         return $this;
+    }
+
+    /**
+     * 路由 controller 外嵌逻辑
+     * 
+     * 采用 Inversion of Control 设计，把详细的逻辑交由外部控制
+     * 
+     * @example 入参即为路由 controller
+     * ```php
+     * Route::useController(function ($controller) {
+     *      // 一些逻辑
+     *      return $controller;
+     * });
+     * ```
+     * 
+     * @param function $fn 控制器函数。重要：内部必须返回函数
+     */
+    public static function useController($fn)
+    {
+        if (is_callable($fn)) {
+            self::$wrapControllerFn = $fn;
+            return;
+        }
+    }
+    /** 默认的 IoC 容器 */
+    private static function IoC($controller)
+    {
+        return $controller;
     }
 }

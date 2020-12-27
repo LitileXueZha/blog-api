@@ -47,9 +47,30 @@ $config = [
 date_default_timezone_set('Asia/Shanghai');
 spl_autoload_register(function ($className) {
     $classDir = ['constants', 'interfaces', 'kits', 'middleware'];
+    // 自定义命名空间注册
+    $nsPrefixDir = [
+        'TC\\Model\\' => '/src/models',
+        // 'TC\\Controller\\' => '/src/controllers',
+    ];
 
-    for ($i = 0; $i < 4; $i++) {
-        $file = __DIR__."/src/$classDir[$i]/$className.php";
+    foreach ($nsPrefixDir as $ns => $dir) {
+        $len = strlen($ns);
+        // TODO: PHP8 可使用 str_starts_with
+        if (substr($className, 0, $len) !== $ns) {
+            continue;
+        }
+
+        $class = substr($className, $len);
+        $file = __DIR__."$dir/$class.php";
+
+        if (file_exists($file)) {
+            require_once $file;
+            return;
+        }
+    }
+
+    foreach ($classDir as $dir) {
+        $file = __DIR__."/src/$dir/$className.php";
 
         if (file_exists($file)) {
             require_once $file;
