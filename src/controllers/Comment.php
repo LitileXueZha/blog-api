@@ -4,8 +4,6 @@
  * 评论的一系列逻辑，CURD
  */
 
-require_once __DIR__.'/../models/Comment.php';
-
 use TC\Model\Comment as MMC;
 
 class Comment extends BaseController

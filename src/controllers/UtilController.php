@@ -6,9 +6,6 @@
  * 比如：单个接口包含了文章、标签、留言等数据
  */
 
-require_once __DIR__.'/../models/Article.php';
-require_once __DIR__.'/../models/Tag.php';
-
 use TC\Model\Article as MMA;
 use TC\Model\Tag as MMT;
 

@@ -4,8 +4,6 @@
  * 服务端渲染逻辑
  */
 
-require_once __DIR__. '/../models/Article.php';
-
 use TC\Model\Article as MMA;
 
 class SSR extends BaseController {
@@ -32,7 +30,13 @@ class SSR extends BaseController {
         if (!file_exists($filename)) {
             http_response_code(500);
             echo '模板资源不存在。';
-            Log::error('运行错误', '服务端渲染找不到模板资源', __FILE__, __LINE__, null);
+            Log::error(
+                '运行错误',
+                '服务端渲染找不到模板资源',
+                __FILE__,
+                __LINE__,
+                'at '. __FILE__ .'('. __LINE__ .')'
+            );
             exit();
         }
 

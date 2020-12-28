@@ -4,8 +4,6 @@
  * 跟用户相关的逻辑，包括特殊的 API 鉴权
  */
 
-require_once __DIR__.'/../models/User.php';
-
 use TC\Model\User as MMU;
 
 class User extends BaseController

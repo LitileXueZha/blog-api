@@ -4,9 +4,6 @@
  * 文章的一系列逻辑，CURD
  */
 
-require_once __DIR__.'/../models/Article.php';
-require_once __DIR__.'/../models/AccessControl.php';
-
 use TC\Model\Article as MMA;
 use TC\Model\AccessControl as ACL;
 
@@ -136,6 +133,8 @@ class Article extends BaseController
             return;
         }
 
+        $siblings = MMA::getSiblings($id, 'publish_at');
+        $rows[0]['siblings'] = $siblings;
         $res = new Response(HttpCode::OK, $rows[0]);
 
         $res->end();

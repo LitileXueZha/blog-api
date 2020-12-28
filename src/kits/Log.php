@@ -32,7 +32,7 @@ class Log
      * 
      * @param Array $log 日志元数据
      */
-    private static function exec($log)
+    private static function write($log)
     {
         $type = $log['type'];
         $channel = $log['channel'];
@@ -63,7 +63,7 @@ class Log
      */
     public static function error($channel, $msg, $file, $line, $traceStr = '')
     {
-        self::exec([
+        self::write([
             'type' => 'ERROR',
             'channel' => $channel,
             'msg' => $msg,
@@ -80,8 +80,10 @@ class Log
      */
     public static function debug($data)
     {
-        header('Content-Type: application/json');
-        header('Access-Control-Allow-Origin: *');
+        if (!headers_sent()) {
+            header('Content-Type: application/json');
+            header('Access-Control-Allow-Origin: *');
+        }
         echo json_encode([
             'DEBUG' => true,
             'description' => '调试数据输出',

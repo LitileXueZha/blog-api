@@ -4,9 +4,6 @@
  * 标签的一系列逻辑，CURD
  */
 
-require_once __DIR__.'/../models/Tag.php';
-require_once __DIR__.'/../models/Tag.php';
-
 use TC\Model\Tag as MMT;
 use TC\Model\AccessControl as ACL;
 

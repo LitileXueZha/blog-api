@@ -163,4 +163,51 @@ class Response
         // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）
         exit();
     }
+
+    /**
+     * 结束本次请求
+     * 
+     * 不直接 `exit()`，可以直接运行某些后台任务。为 Middleware::fallback 提供可能
+     * 
+     * Internally, the HttpKernel makes use of the fastcgi_finish_request PHP function. This means
+     * that at the moment, only the PHP FPM server API is able to send a response to the client
+     * while the server’s PHP process still performs some tasks. With all other server APIs,
+     * listeners to kernel.terminate are still executed, but the response is not sent to the client
+     * until they are all completed.
+     * @see https://symfony.com/doc/current/components/http_kernel.html#component-http-kernel-kernel-terminate
+     * 
+     * 只有 php-fpm 可以实现这个功能，其它诸如 mod_php/fastcgi.exe 都不支持。
+     * 根本原因还是 PHP 没有内建的服务器，只是设计成一门解释性语言，没有请求的概念，只有
+     * 一个请求过程，导致多平台上对其实现不一。
+     * 
+     * 目前也有基于 PHP 第三方支持服务器的，比如 Swoole。
+     * 还有新的 php-pm 进程管理器（适用于各大框架）、facebook/hhvm 虚拟机
+     */
+    public static function finishRequest($data = null)
+    {
+        // php-fpm
+        if (function_exists('fastcgi_finish_request')) {
+            echo $data;
+            session_write_close();
+            fastcgi_finish_request();
+            return;
+        }
+
+        // Apache + mod_php
+        // Nginx + php-cgi.exe
+
+        if (ob_get_level() > 0) {
+            ob_end_clean(); // nginx
+        }
+        ob_start();
+        echo $data;
+        header('Connection: close');
+        header("X-Accel-Buffering: no"); // nginx
+        header('Content-Length: '. ob_get_length());
+        ob_end_flush();
+        flush();
+
+        // FIXME: 使用耗时的操作将导致后续一切 nginx 请求挂起
+        // sleep(3);
+    }
 }

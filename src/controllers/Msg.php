@@ -4,8 +4,6 @@
  * 留言的一系列逻辑，CURD
  */
 
-require_once __DIR__.'/../models/Msg.php';
-
 use TC\Model\Msg as MM;
 
 class Msg extends BaseController

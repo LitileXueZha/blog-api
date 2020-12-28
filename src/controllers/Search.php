@@ -7,8 +7,6 @@
  * TODO: 现在直接搜索数据，后续考虑使用 Redis 做缓存
  */
 
-require_once __DIR__.'/../models/Article.php';
-
 use TC\Model\Article as MMA;
 
 class Search extends BaseController
