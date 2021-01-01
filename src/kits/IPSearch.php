@@ -62,10 +62,14 @@ class IPSearch
 
         $url = "http://ip.tool.chinaz.com/$ip";
         $content = file_get_contents($url);
+        // $reg = '/<span class="Whwtdhalf w50-0">(.+?)<\/span>/m';
+        $reg = '/<span class="Whwtdhalf w30-0 lh24 tl ml80">[\s\S]+?<p>(.+?)<\/p>/m';
 
-        preg_match_all('/<span class="Whwtdhalf w50-0">(.+?)<\/span>/m', $content, $res);
+        if (preg_match($reg, $content, $res)) {
+            return $res[1];
+        }
 
-        return $res[1][1];
+        return;
     }
 
     /**
