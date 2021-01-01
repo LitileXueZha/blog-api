@@ -29,7 +29,7 @@ class Article extends BaseController
         $limit = self::getLimitByQuery($params);
 
         // 可供查询的字段
-        $selectableKeys = ['tag', 'status', 'category'];
+        $selectableKeys = ['tag', 'status', 'category', 'period'];
         $params = Util::filter($params, $selectableKeys);
         
         $uid = $req['AUTH_MIDDLEWARE']['user'];
@@ -44,6 +44,15 @@ class Article extends BaseController
         $orderBy = $uid === ADMIN
             ? 'modify_at DESC, create_at DESC'
             : 'publish_at DESC, create_at DESC';
+
+        // 根据一段时期（季节）查询
+        if (isset($params['period'])) {
+            [$startAt, $endAt] = Util::parsePeriod($params['period']);
+
+            if ($startAt) $params['create_at>'] = $startAt;
+            if ($endAt) $params['create_at<'] = $endAt;
+            unset($params['period']);
+        }
 
         // 筛选未删除字段
         $params['_d'] = 0;

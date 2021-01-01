@@ -224,4 +224,53 @@ final class Util
 
         return $data;
     }
+
+    /**
+     * 解析日期格式
+     * 
+     * @example
+     * + "autumn2018" => ["2018-08-01", "2018-10-31"]
+     * + "summer2018" => ["2018-05-01", "2018-07-31"]
+     * + "spring2018" => ["2018-02-01", "2018-04-30"]
+     * + "winter2017" => ["2017-11-01", "2018-01-31"]
+     * + "earlier2020-03" => [null, "2020-02-29"]
+     * 
+     * @param string 日期
+     * @return array 日期区间。格式为：[start_at, end_at]
+     */
+    public static function parsePeriod($period)
+    {
+        $dayPad = '-01';
+        // $dayPad = '-01 00:00:00';
+        $regSeason = "/^((autumn|summer|spring|winter)(\d{4})$)|(earlier(\d{4}-\d{2})$)/";
+        $startAt = null;
+        $endAt = null;
+
+        if (preg_match($regSeason, $period, $matches)) {
+            if (isset($matches[5])) {
+                // 更早，只处理结束时间
+                $d = new DateTime($matches[5].$dayPad);
+                $endAt = $d->modify('-1 day')->format('Y-m-d');
+            } else {
+                $seasons = [
+                    'autumn' => ['08', '10'],
+                    'summer' => ['05', '07'],
+                    'spring' => ['02', '04'],
+                    'winter' => ['11', '01'],
+                ];
+                $season = $matches[2];
+                $year = $matches[3];
+                [$startMonth, $endMonth] = $seasons[$season];
+                // 冬季结束年份 +1
+                $endYear = $season === 'winter' ? intval($year) + 1 : $year;
+
+                $startAt = "$year-$startMonth$dayPad";
+                // 结束时间补位
+                $dayPad = $season === 'spring' ? '-30' : '-31';
+                $endAt = "$endYear-$endMonth$dayPad";
+            }
+        }
+
+        return [$startAt, $endAt];
+    }
 }

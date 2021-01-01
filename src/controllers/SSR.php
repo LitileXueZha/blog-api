@@ -46,6 +46,8 @@ class SSR extends BaseController {
         // 当查询到该文章时，处理 html 片段
         if ($res['total'] > 0) {
             $row = $res['items'][0];
+            $siblings = MMA::getSiblings($row['id'], 'publish_at');
+            $row['siblings'] = $siblings;
             $textContent = htmlspecialchars($row['text_content']);
             // 减小体积
             unset($row['text_content']);

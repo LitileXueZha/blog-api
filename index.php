@@ -36,6 +36,7 @@ $route = new Route('/v1');
 $route
     ->get('/', function ($req){
         // @example 函数控制器
+        // echo '你好。';
     })
     // 文章模块
     ->get('/articles', 'Article::list') // 获取文章列表

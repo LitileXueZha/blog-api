@@ -101,6 +101,9 @@ class Article
             ->orderBy($orderBy);
 
         $statement = $dbs->toString();
+        // 转化 >、< 规则使之合法
+        // TODO: 放到 dbs 中，包括下面的 bindValue
+        $statement = preg_replace(['/:(\w+)>/', '/:(\w+)</'], [':$1Lt', ':$1Gt'], $statement);
         $sql = $db->prepare($statement);
 
         // 绑定参数
@@ -115,6 +118,7 @@ class Article
                 continue;
             }
 
+            $key = str_replace(['>', '<'], ['Lt', 'Gt'], $key);
             $sql->bindValue(":$key", $param);
         }
 

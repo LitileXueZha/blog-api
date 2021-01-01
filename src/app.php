@@ -29,15 +29,10 @@ class App
     {
         // 1. 异常捕获
         ErrorHandler::init();
-
         // 2. 构造请求对象
         self::$req = (array) new Request();
-
         // 3. 应用中间件
         self::applyMiddleware();
-
-        // 4. 默认返回
-        echo '你好。';
     }
 
     /**

@@ -40,3 +40,11 @@ display_startup_errors = Off
 ; 暴露 PHP 版本信息。在 header 里的 X-Powerd-By: PHP/7.2
 expose_php = Off
 ```
+
+## 其它的一些杂项
+
+**Composer 运行超时**。其默认时间为 `300s`，超过其运行时间时进程将中断，可以通过 `process-timeout` 来设置长短。考虑到其他原因，推荐运行命令时传参：
+
+```shell
+$ composer start --timeout=0
+```
