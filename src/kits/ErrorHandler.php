@@ -45,8 +45,8 @@ class ErrorHandler
             ];
 
             // 保证错误格式一致。额外的操作
-            $err['trace'] = debug_backtrace();
-            $err['trace_str'] = "at $errfile($errline)";
+            $err['trace'] = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+            $err['trace_str'] = "at $errfile($errline)\n". self::backtraceToString($err['trace']);
 
             self::handle($err, self::ERROR);
         });
@@ -91,7 +91,6 @@ class ErrorHandler
      * 
      * @return void
      */
-
     private static function handle($err, $code)
     {
         // 启用调试时，直接将数据输出到浏览器
@@ -121,6 +120,43 @@ class ErrorHandler
         // 默认返回错误
         $res = new Response(HttpCode::INTERNAL_SERVER_ERROR);
         $res->end();
+    }
+
+    /**
+     * 转化 debug_backtrace 数组为 PHP 格式 trace_str
+     * 
+     * @param array 堆栈数组
+     * @return string
+     */
+    protected static function backtraceToString($trace)
+    {
+        $arr = [];
+        $len = count($trace);
+
+        // 丢弃第一条由 debug_backtrace 产生的栈
+        for ($i = 1; $i < $len; $i++) {
+            /**
+             * exception 中的格式
+             * 
+             * #5 Users\blog-api\src\middleware\RouteMiddleware.php(90): {closure}(Array)
+             * #7 Users\blog-api\src\app.php(58): App::{closure}()
+             */
+            $stack = $trace[$i];
+            [
+                'file' => $file,
+                'line' => $line,
+                'function' => $func,
+            ] = $stack;
+            // 可能只是个函数调用
+            $class = empty($stack['class']) ? '' : $stack['class'];
+            $type = empty($stack['type']) ? '' : $stack['type'];
+
+            $no = $i - 1;
+            $str = "#$no $file($line): $class$type$func()";
+            $arr[] = $str;
+        }
+
+        return implode("\n", $arr);
     }
 }
 

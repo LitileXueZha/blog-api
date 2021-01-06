@@ -134,17 +134,23 @@ class Article extends BaseController
         // 筛选未逻辑删除字段
         $params = ['article_id' => $id, '_d' => 0];
         $res = MMA::get($params);
-        $rows = $res['items'];
 
         // 不存在此条记录，返回 404
-        if (count($rows) === 0) {
+        if ($res['total'] === 0) {
             self::notFound();
             return;
         }
 
-        $siblings = MMA::getSiblings($id, 'publish_at');
-        $rows[0]['siblings'] = $siblings;
-        $res = new Response(HttpCode::OK, $rows[0]);
+        $row = $res['items'][0];
+        $siblings = []; // 保持一致格式
+
+        if ($row['status'] === self::ONLINE) {
+            // 已上线文章查询上下一篇
+            $siblings = MMA::getSiblings($id, 'publish_at');
+        }
+
+        $row['siblings'] = $siblings;
+        $res = new Response(HttpCode::OK, $row);
 
         $res->end();
     }
