@@ -44,16 +44,9 @@ class UtilController extends BaseController
                 }
 
                 // 除去文章正文
-                $resolveArticles[] = [
-                    'id' => $article['id'],
-                    'title' => $article['title'],
-                    'summary' => $article['summary'],
-                    'category' => $article['category'],
-                    'tag' => $article['tag'],
-                    'tag_name' => $article['tag_name'],
-                    'bg' => $article['bg'],
-                    'create_at' => $article['create_at'],
-                ];
+                unset($article['content']);
+                unset($article['text_content']);
+                $resolveArticles[] = $article;
             }
         }
 
