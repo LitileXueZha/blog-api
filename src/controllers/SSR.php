@@ -38,6 +38,9 @@ class SSR extends BaseController {
             'status' => 1,
         ];
         $res = MMA::get($params);
+        $injectTitle = '%ssr_title%';
+        $injectKeywords = '%ssr_keywords%';
+        $injectDescription = '%ssr_description%';
 
         // 当查询到该文章时，处理 html 片段
         if ($res['total'] > 0) {
@@ -62,17 +65,16 @@ class SSR extends BaseController {
              * 主要是执行环境的问题，php 下输出的 html 可能和 js 渲染不一致，
              * 目前还是简单地附加内容到 html 里，专为 seo。另外再注入数据
              */
-            $keywords = $row['tag_name'] .',';
-            $defaultDescription = "滔's 博客，前端开发工程师的学习笔记。每天的技术分享与生活笔记，谨以此来纪念即将逝去的青春。";
-            $injectTitle = '%ssr_title%';
-            $injectKeywords = '%ssr_keywords%';
-            $injectDescription = '%ssr_description%';
             $injectKey = '<!-- %ssr_inject% -->';
 
             $rawFile = str_replace($injectTitle, $row['title'], $rawFile);
-            $rawFile = str_replace($injectKeywords, $keywords, $rawFile);
+            $rawFile = str_replace($injectKeywords, $row['tag_name'] .',', $rawFile);
             $rawFile = str_replace($injectDescription, $row['summary'], $rawFile);
             $rawFile = str_replace($injectKey, $html, $rawFile);
+        } else {
+            $rawFile = str_replace($injectTitle, '文章详情', $rawFile);
+            $rawFile = str_replace($injectKeywords, '404,', $rawFile);
+            $rawFile = str_replace($injectDescription, "滔's 博客，前端开发工程师的学习笔记。每天的技术分享与生活笔记，谨以此来纪念即将逝去的青春。", $rawFile);
         }
 
         echo $rawFile;
