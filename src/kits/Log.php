@@ -84,11 +84,13 @@ class Log
             header('Content-Type: application/json');
             header('Access-Control-Allow-Origin: *');
         }
-        echo json_encode([
+        $json = json_encode([
             'DEBUG' => true,
             'description' => '调试数据输出',
             'data' => $data,
-        ]);
+        ], JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE);
+
+        echo $json || json_last_error_msg();
         exit();
     }
 }

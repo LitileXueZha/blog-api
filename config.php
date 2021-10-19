@@ -18,7 +18,12 @@ $config = [
     // NOTE: 线上必须设置为 false！！！
     'DEBUG' => false,
 
-    'CORS' => 'https://www.ningtaostudy.cn',
+    'CORS' => [
+        'https://www.ningtaostudy.cn',
+        'https://ningtaostudy.cn',
+        'http://www.ningtaostudy.cn',
+        'http://ningtaostudy.cn',
+    ],
 
     'DB_HOST' => '127.0.0.1',
     'DB_PORT' => 3306,
@@ -32,7 +37,7 @@ $config = [
     'API_SECRET' => 'Mr.tao is handsome!',
 
     // 管理员 id
-    'ADMIN' => '__ADMIN__',
+    'ADMIN' => 'who',
 
     // 服务端渲染模板来源
     'SSR_SOURCE' => 'C:/Users/tao/Desktop/Workspace/blog/dist',

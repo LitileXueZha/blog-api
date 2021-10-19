@@ -117,6 +117,11 @@ class Article extends BaseController
         $keys = ['title', 'summary', 'content', 'text_content', 'status', 'tag', 'category', 'bg'];
         $data = Util::filter($data, $keys);
 
+        // 创建完直接上线，添加发布时间
+        if (isset($data['status']) && $data['status'] === self::ONLINE) {
+            $data['publish_at'] = date('Y-m-d H:i:s');
+        }
+
         $record = MMA::add($data);
         $res = new Response(HttpCode::OK, $record);
 
@@ -143,8 +148,10 @@ class Article extends BaseController
 
         $row = $res['items'][0];
         $siblings = []; // 保持一致格式
+        $uid = $req['AUTH_MIDDLEWARE']['user'];
 
-        if ($row['status'] === self::ONLINE) {
+        // 管理员无需查询。或许性能
+        if ($row['status'] === self::ONLINE && $uid !== ADMIN) {
             // 已上线文章查询上下一篇
             $siblings = MMA::getSiblings($id, 'publish_at');
         }

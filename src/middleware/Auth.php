@@ -41,28 +41,17 @@ class Auth implements Middleware
         $headers = $req['headers'];
         $url = $req['url'];
 
-        /**
-         * 这部分的处理放到了 nginx 里，原因是传给 php 处里耗时
-         * 
-         * ```nginx
-         * if ($request_method = 'OPTIONS') {
-         *     add_header xxx;
-         *     return 204;
-         * }
-         * ```
-         */
         // 1. 跳过 OPTIONS 请求
         if ($method === 'OPTIONS') {
             $res = new Response(HttpCode::NO_CONTENT);
             $res->end();
-            // 取消跳转剩下的中间件，直接跳过
-            // $next();
-            return;
+            exit();
         }
 
         // 指明服务端渲染的路由跳过
         // 需要 nginx 支持，传递一个请求头 x-private-ssr
         if (isset($_SERVER['X_PRIVATE_SSR'])) {
+            // 取消跳转剩下的中间件，直接跳过
             $next();
             return;
         }

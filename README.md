@@ -1,4 +1,4 @@
-# Blog Api
+# Blog API
 
 为博客提供服务。用原生 PHP 实现，以后再了解一些框架使用
 
@@ -40,6 +40,35 @@ display_startup_errors = Off
 ; 暴露 PHP 版本信息。在 header 里的 X-Powerd-By: PHP/7.2
 expose_php = Off
 ```
+
+### TTFB 第一次连接耗时太长
+
+参考地址：[https://www.digitalocean.com/community/questions/how-can-i-improve-the-ttfb](https://www.digitalocean.com/community/questions/how-can-i-improve-the-ttfb)
+
+1. 开启 http2
+2. 关闭 gzip
+3. 开启 fastcgi_cache
+
+```nginx
+http {
+    fastcgi_cache_path /var/cache/nginx levels=1:2 keys_zone=PHPCACHE:100m inactive=60m;
+    fastcgi_cache_key $scheme$request_method$host$request_uri;
+
+    server {
+        listen 443 ssl http2;
+        gzip off;
+
+        location ~ \.php$ {
+            fastcgi_cache PHPCACHE; # The name of the cache key-zone to use
+            fastcgi_cache_valid 200 30m; # What to cache: 'Code 200' responses, for half an hour
+            fastcgi_cache_methods GET HEAD; # What to cache: only GET and HEAD requests (not POST)
+            add_header X-Fastcgi-Cache $upstream_cache_status; # Add header so we can see if the cache hits or misses
+        }
+    }
+}
+```
+
+**结果**：一点用都没有。。。而且还导致了 API 请求被缓存了，数据库数据都更新了，接口返回的还是缓存里的数据！
 
 ## 其它的一些杂项
 

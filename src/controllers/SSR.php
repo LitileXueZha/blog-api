@@ -8,7 +8,7 @@ use TC\Model\Article as MMA;
 
 class SSR extends BaseController {
     /** 文章模板页 */
-    const ARTICLE = '/articles/detail.html';
+    const ARTICLE = SSR_SOURCE .'/articles/detail.html';
 
     /**
      * 渲染文章详情页
@@ -17,31 +17,27 @@ class SSR extends BaseController {
      */
     public static function renderArticle($req)
     {
-        $id = $req['params']['id'];
-        // 筛选线上文章
-        $params = [
-            'article_id' => $id,
-            '_d' => 0,
-            'status' => 1,
-        ];
-        $filename = SSR_SOURCE . self::ARTICLE;
-
         // 模板文件有误
-        if (!file_exists($filename)) {
+        if (!file_exists(self::ARTICLE)) {
             http_response_code(500);
             echo '模板资源不存在。';
             Log::error(
                 '运行错误',
-                '服务端渲染找不到模板资源',
-                __FILE__,
-                __LINE__,
+                '服务端渲染找不到模板资源: '. self::ARTICLE,
+                __FILE__, __LINE__,
                 'at '. __FILE__ .'('. __LINE__ .')'
             );
             exit();
         }
 
+        $rawFile = file_get_contents(self::ARTICLE);
+        // 筛选线上文章
+        $params = [
+            'article_id' => $req['params']['id'],
+            '_d' => 0,
+            'status' => 1,
+        ];
         $res = MMA::get($params);
-        $rawFile = file_get_contents($filename);
 
         // 当查询到该文章时，处理 html 片段
         if ($res['total'] > 0) {
@@ -59,14 +55,24 @@ class SSR extends BaseController {
                 ."<p>$textContent</p>"
                 ."<script>__SSR_DATA__=$data;</script>"
                 ."</div>";
-            
-            // TODO: 简单地注入
-            // 这只能说是服务端注入，而不是服务端渲染。
-            // 主要是执行环境的问题，php 下输出的 html 可能和 js 渲染不一致，
-            // 目前还是简单地附加内容到 html 里，专为 seo。另外再注入数据
-            $rawFile = str_replace("<!-- %ssr_inject% -->", $html, $rawFile);
-            // 添加文档标题
-            $rawFile = preg_replace('/<title>.*?<\/title>/', "<title>{$row['title']}_滔's 博客</title>", $rawFile);
+
+            /**
+             * TODO: 简单地注入
+             * 这只能说是服务端注入，而不是服务端渲染。
+             * 主要是执行环境的问题，php 下输出的 html 可能和 js 渲染不一致，
+             * 目前还是简单地附加内容到 html 里，专为 seo。另外再注入数据
+             */
+            $keywords = $row['tag_name'] .',';
+            $defaultDescription = "滔's 博客，前端开发工程师的学习笔记。每天的技术分享与生活笔记，谨以此来纪念即将逝去的青春。";
+            $injectTitle = '%ssr_title%';
+            $injectKeywords = '%ssr_keywords%';
+            $injectDescription = '%ssr_description%';
+            $injectKey = '<!-- %ssr_inject% -->';
+
+            $rawFile = str_replace($injectTitle, $row['title'], $rawFile);
+            $rawFile = str_replace($injectKeywords, $keywords, $rawFile);
+            $rawFile = str_replace($injectDescription, $row['summary'], $rawFile);
+            $rawFile = str_replace($injectKey, $html, $rawFile);
         }
 
         echo $rawFile;

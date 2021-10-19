@@ -18,9 +18,9 @@ class Response
     private $httpCode;
     // HTTP 头部。默认选项
     private $headers = [
-        'Content-Type: application/json',
+        'Content-Type: application/json;charset=utf-8',
         // 跨域
-        'Access-Control-Allow-Origin: '. (DEBUG ? '*' : CORS),
+        'cors' => 'Access-Control-Allow-Origin: '. (DEBUG ? '*' : CORS[0]),
         'Access-Control-Allow-Methods: OPTIONS,HEAD,GET,POST,PUT,DELETE',
         'Access-Control-Allow-Headers: Authorization,Content-Type',
     ];
@@ -48,6 +48,13 @@ class Response
 
         // 设置数据
         $this->data = $data;
+
+        // 不同站点的跨域支持
+        // NOTE: 同域请求不存在 Origin 请求头
+        $origin = $_SERVER['HTTP_ORIGIN'] ?? false;
+        if ($origin && in_array($origin, CORS)) {
+            $this->headers['cors'] = "Access-Control-Allow-Origin: $origin";
+        }
     }
 
     /**
@@ -126,12 +133,9 @@ class Response
     {
         // 设置 HTTP code
         http_response_code($this->httpCode);
-
         // 设置 HTTP header
-        $len = count($this->headers);
-
-        for ($i = 0; $i < $len; $i ++) {
-            header($this->headers[$i]);
+        foreach($this->headers as $header) {
+            header($header);
         }
 
         // 指明不要返回任何内容
@@ -158,6 +162,8 @@ class Response
             throw new Exception('json_last_error: '. json_last_error());
         }
 
+        // API 接口添加 Content-Length 响应头，貌似更快？
+        header('Content-Length:'. strlen($json));
         echo $json;
 
         // 暂时先中断程序。如果以后有特殊情况（返回数据后 PHP 还需要做额外的操作）
