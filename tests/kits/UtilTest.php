@@ -158,4 +158,16 @@ class UtilTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals(['key2' => 2], Util::filter($data, ['key2']));
         $this->assertEquals([], Util::filter($data, ['key4']));
     }
+
+    /**
+     * @testdox 是否异或加密正确
+     */
+    public function testXorEncrypt()
+    {
+        $str = 'hello world!';
+        $enc = 'cipher';
+
+        $this->assertEquals($str, Util::xorEncrypt(Util::xorEncrypt($str, $enc), $enc));
+        $this->assertEquals($enc, Util::xorEncrypt(Util::xorEncrypt($enc, $str), $str));
+    }
 }

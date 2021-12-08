@@ -91,9 +91,10 @@ class User extends BaseController
         }
 
         $user = $rows['items'][0];
+        $decryptPwd = Util::xorEncrypt(base64_decode($data['pwd']), $data['account'].date('j'));
 
         // 验证密码
-        if (!password_verify($data['pwd'], $user['pwd'])) {
+        if (!password_verify($decryptPwd, $user['pwd'])) {
             self::bad('密码错误');
             return;
         }

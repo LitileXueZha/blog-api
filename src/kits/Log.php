@@ -90,7 +90,7 @@ class Log
             'data' => $data,
         ], JSON_INVALID_UTF8_IGNORE | JSON_UNESCAPED_UNICODE);
 
-        echo $json || json_last_error_msg();
+        echo $json ?: json_last_error_msg();
         exit();
     }
 }

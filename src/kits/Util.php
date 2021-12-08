@@ -273,4 +273,31 @@ final class Util
 
         return [$startAt, $endAt];
     }
+
+
+    /**
+     * 简单 ASCII 异或加密
+     * 
+     * @param string 待加密消息
+     * @param string 异或字符
+     * @return string
+     */
+    public static function xorEncrypt($str, $enc)
+    {
+        $i = 0;
+        $encIdx = 0;
+        $len = strlen($str);
+        $encLength = strlen($enc);
+        $result = [];
+
+        while ($i < $len) {
+            $encIdx = 0;
+            while ($encIdx < $encLength && $i < $len) {
+                $result[] = chr(ord($str[$i]) ^ ord($enc[$encIdx]));
+                $i ++;
+                $encIdx ++;
+            }
+        }
+        return implode('', $result);
+    }
 }
