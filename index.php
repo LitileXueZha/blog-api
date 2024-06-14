@@ -31,7 +31,7 @@ Route::useController(function ($controller) {
 
 // 版本号 v1
 // 如果之后新开接口，和现有冲突，换个版本号就行
-$route = new Route('/v1');
+$route = new Route('/api/v1');
 
 $route
     ->get('/', function ($req){

@@ -17,8 +17,10 @@ class SSR extends BaseController {
      */
     public static function renderArticle($req)
     {
+        $rawFile = file_get_contents(self::ARTICLE);
+
         // 模板文件有误
-        if (!file_exists(self::ARTICLE)) {
+        if ($rawFile === false) {
             http_response_code(500);
             echo '模板资源不存在。';
             Log::error(
@@ -30,7 +32,6 @@ class SSR extends BaseController {
             exit();
         }
 
-        $rawFile = file_get_contents(self::ARTICLE);
         // 筛选线上文章
         $params = [
             'article_id' => $req['params']['id'],
@@ -53,7 +54,7 @@ class SSR extends BaseController {
             $data = json_encode($row, JSON_UNESCAPED_UNICODE);
 
             // 隐藏内容
-            $html = "<div style='white-space:pre;width:770px;height:300px;position:absolute;left:-100%;overflow:scroll;'>"
+            $html = "<div class='seo-content'>"
                 ."<h1>{$row['title']}</h1>"
                 ."<p>$textContent</p>"
                 ."<script>__SSR_DATA__=$data;</script>"

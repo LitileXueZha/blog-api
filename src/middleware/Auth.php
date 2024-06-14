@@ -16,7 +16,7 @@ class Auth implements Middleware
      * 
      * @var Array
      */
-    const API_OMIT = ['/v1/oauth', '/v1/user/login'];
+    const API_OMIT = ['/api/v1/oauth', '/api/v1/user/login'];
 
     /**
      * 令牌失效时间，单位为天
